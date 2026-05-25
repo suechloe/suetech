@@ -1,0 +1,986 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Sue Tech · 控制台</title>
+<link rel="icon" type="image/svg+xml" href="/favicon.svg">
+<style>
+:root {
+  --bg:#f0f2f5; --sidebar-bg:#1a1d2e; --sidebar-w:240px; --topbar-h:56px;
+  --card:#fff; --primary:#5b6ef5; --primary-light:#eef0ff;
+  --ok:#10b981; --warn:#f59e0b; --bad:#ef4444;
+  --text:#111827; --sub:#6b7280; --border:#e5e7eb;
+  --radius:12px; --shadow:0 1px 4px rgba(0,0,0,.07);
+}
+*{margin:0;padding:0;box-sizing:border-box;}
+body{font-family:-apple-system,BlinkMacSystemFont,"Segoe UI",Roboto,sans-serif;background:var(--bg);color:var(--text);height:100vh;display:flex;flex-direction:column;overflow:hidden;}
+
+/* Topbar */
+.topbar{height:var(--topbar-h);flex-shrink:0;background:var(--card);border-bottom:1px solid var(--border);display:flex;align-items:center;justify-content:space-between;padding:0 24px;z-index:10;}
+.topbar-left{display:flex;align-items:center;gap:10px;}
+.topbar-left .diamond{color:var(--primary);font-size:18px;}
+.topbar-left h1{font-size:17px;font-weight:700;letter-spacing:-.3px;}
+.topbar-right{display:flex;align-items:center;gap:16px;font-size:13px;color:var(--sub);}
+.status-pill{display:flex;align-items:center;gap:6px;background:#f0fdf4;border:1px solid #bbf7d0;border-radius:20px;padding:4px 12px;color:#15803d;font-size:12px;font-weight:500;}
+.status-pill .dot{width:7px;height:7px;border-radius:50%;background:#22c55e;}
+
+/* Layout */
+.shell{display:flex;flex:1;overflow:hidden;}
+
+/* Sidebar */
+.sidebar{width:var(--sidebar-w);flex-shrink:0;background:var(--sidebar-bg);display:flex;flex-direction:column;overflow-y:auto;overflow-x:hidden;padding:16px 0 12px;}
+.section{padding:0 14px;margin-bottom:6px;}
+.section-label{font-size:10px;font-weight:600;color:rgba(255,255,255,.3);text-transform:uppercase;letter-spacing:.8px;padding:0 8px;margin-bottom:4px;}
+.s-item{display:flex;align-items:center;gap:10px;padding:9px 8px;border-radius:8px;cursor:pointer;color:rgba(255,255,255,.6);font-size:13.5px;font-weight:500;transition:background .15s,color .15s;}
+.s-item:hover{background:rgba(255,255,255,.07);color:#fff;}
+.s-item.active{background:var(--primary);color:#fff;}
+.s-item .s-icon{width:22px;text-align:center;font-size:15px;flex-shrink:0;}
+.s-item .s-name{flex:1;}
+.s-item .s-tag{font-size:10px;font-weight:600;padding:2px 6px;border-radius:4px;background:rgba(255,255,255,.12);color:rgba(255,255,255,.7);}
+.s-item.active .s-tag{background:rgba(255,255,255,.25);color:#fff;}
+.s-item .s-badge{width:7px;height:7px;border-radius:50%;background:var(--ok);flex-shrink:0;}
+.s-divider{height:1px;background:rgba(255,255,255,.06);margin:8px 14px;}
+.s-model{display:flex;align-items:center;gap:10px;padding:8px 8px;border-radius:8px;cursor:pointer;color:rgba(255,255,255,.5);font-size:12.5px;font-weight:500;transition:background .15s,color .15s;}
+.s-model:hover{background:rgba(255,255,255,.06);color:rgba(255,255,255,.85);}
+.s-model.sel{background:rgba(91,110,245,.25);color:#a5b4fc;font-weight:600;}
+.s-model .m-dot{width:6px;height:6px;border-radius:50%;background:rgba(255,255,255,.2);flex-shrink:0;}
+.s-model.sel .m-dot{background:#a5b4fc;}
+
+/* Main */
+.main{flex:1;overflow-y:auto;padding:24px;display:flex;flex-direction:column;gap:20px;}
+.page-hd{display:flex;align-items:center;justify-content:space-between;}
+.page-hd h2{font-size:18px;font-weight:700;}
+.page-hd .sub{font-size:13px;color:var(--sub);}
+
+/* Cards & grid */
+.grid-2{display:grid;grid-template-columns:1fr 1fr;gap:16px;}
+.grid-3{display:grid;grid-template-columns:repeat(3,1fr);gap:16px;}
+.grid-4{display:grid;grid-template-columns:repeat(4,1fr);gap:16px;}
+.card{background:var(--card);border-radius:var(--radius);border:1px solid var(--border);box-shadow:var(--shadow);padding:20px;}
+.card-hd{display:flex;align-items:center;justify-content:space-between;margin-bottom:16px;}
+.card-hd .title{font-size:13px;font-weight:600;color:var(--sub);text-transform:uppercase;letter-spacing:.4px;}
+.card-hd .btn-xs{font-size:11px;padding:4px 10px;border-radius:6px;border:1px solid var(--border);background:var(--card);cursor:pointer;color:var(--sub);transition:.15s;}
+.card-hd .btn-xs:hover{background:var(--primary);color:#fff;border-color:var(--primary);}
+
+/* Stat tiles */
+.stat-tile{background:var(--card);border:1px solid var(--border);border-radius:var(--radius);padding:20px;box-shadow:var(--shadow);}
+.stat-tile .st-label{font-size:12px;color:var(--sub);margin-bottom:6px;}
+.stat-tile .st-val{font-size:28px;font-weight:800;letter-spacing:-.5px;font-variant-numeric:tabular-nums;line-height:1.1;}
+.stat-tile .st-sub{font-size:12px;color:var(--sub);margin-top:5px;}
+.stat-tile.ok .st-val{color:var(--ok);}
+.stat-tile.warn .st-val{color:var(--warn);}
+.stat-tile.bad .st-val{color:var(--bad);}
+
+/* Agent cards */
+.agent-card{background:var(--card);border:1px solid var(--border);border-radius:var(--radius);padding:16px 20px;display:flex;align-items:center;gap:14px;box-shadow:var(--shadow);cursor:pointer;transition:.15s;}
+.agent-card:hover{border-color:var(--primary);box-shadow:0 0 0 2px var(--primary-light);}
+.agent-av{width:44px;height:44px;border-radius:11px;display:flex;align-items:center;justify-content:center;font-size:20px;flex-shrink:0;}
+.agent-av.nora{background:#eef1ff;}
+.agent-av.sage{background:#e6fdf3;}
+.agent-av.elle{background:#fff7e6;}
+.agent-info{flex:1;}
+.agent-name{font-size:14px;font-weight:700;}
+.agent-role{font-size:12px;color:var(--sub);margin-top:2px;}
+.agent-online{display:flex;align-items:center;gap:5px;font-size:11px;color:var(--ok);font-weight:500;}
+.agent-online .dot{width:6px;height:6px;border-radius:50%;background:var(--ok);}
+
+/* Chat */
+.chat-view{display:flex;flex-direction:column;height:calc(100vh - var(--topbar-h) - 48px);}
+.chat-hd{background:var(--card);border:1px solid var(--border);border-radius:var(--radius) var(--radius) 0 0;padding:14px 20px;display:flex;align-items:center;gap:12px;border-bottom:none;}
+.chat-hd .c-av{width:38px;height:38px;border-radius:9px;display:flex;align-items:center;justify-content:center;font-size:18px;}
+.chat-hd .c-av.nora{background:#eef1ff;}
+.chat-hd .c-av.sage{background:#e6fdf3;}
+.chat-hd .c-av.elle{background:#fff7e6;}
+.chat-hd .c-name{font-size:15px;font-weight:700;}
+.chat-hd .c-role{font-size:12px;color:var(--sub);}
+.chat-msgs{flex:1;overflow-y:auto;background:var(--card);border-left:1px solid var(--border);border-right:1px solid var(--border);padding:16px 20px;display:flex;flex-direction:column;gap:10px;}
+.msg{max-width:72%;padding:10px 14px;border-radius:10px;font-size:13.5px;line-height:1.55;white-space:pre-wrap;}
+.msg.user{background:var(--primary);color:#fff;border-radius:10px 10px 2px 10px;align-self:flex-end;}
+.msg.agent{background:#f3f4f6;color:var(--text);border-radius:10px 10px 10px 2px;align-self:flex-start;}
+.chat-src{align-self:center;font-size:11px;color:var(--sub);background:#f9fafb;border:1px solid var(--border);border-radius:10px;padding:2px 10px;margin:4px 0;}
+.msg-typing{align-self:flex-start;background:#f3f4f6;border-radius:10px 10px 10px 2px;padding:12px 16px;display:flex;gap:4px;}
+.msg-typing span{width:7px;height:7px;border-radius:50%;background:#9ca3af;animation:blink 1.2s infinite both;}
+.msg-typing span:nth-child(2){animation-delay:.2s;}
+.msg-typing span:nth-child(3){animation-delay:.4s;}
+@keyframes blink{0%,80%,100%{opacity:.2;}40%{opacity:1;}}
+.chat-inp-wrap{background:var(--card);border:1px solid var(--border);border-radius:0 0 var(--radius) var(--radius);padding:12px 16px;display:flex;gap:8px;border-top:1px solid var(--border);}
+.chat-inp{flex:1;border:1px solid var(--border);border-radius:8px;padding:9px 14px;font-size:13.5px;outline:none;font-family:inherit;color:var(--text);transition:.15s;}
+.chat-inp:focus{border-color:var(--primary);box-shadow:0 0 0 2px var(--primary-light);}
+.btn-send{background:var(--primary);color:#fff;border:none;border-radius:8px;padding:9px 20px;font-size:13.5px;font-weight:600;cursor:pointer;transition:.15s;}
+.btn-send:hover{background:#4a5de0;}
+.btn-send:disabled{opacity:.5;cursor:default;}
+
+/* Tasks */
+.task-item{display:flex;align-items:flex-start;gap:10px;padding:10px 0;border-bottom:1px solid var(--border);}
+.task-item:last-child{border-bottom:none;}
+.task-chk{width:18px;height:18px;border-radius:50%;border:2px solid var(--border);flex-shrink:0;margin-top:1px;cursor:pointer;display:flex;align-items:center;justify-content:center;transition:.15s;}
+.task-chk:hover{border-color:var(--ok);}
+.task-chk.done{background:var(--ok);border-color:var(--ok);}
+.task-chk.done::after{content:"✓";color:#fff;font-size:10px;font-weight:700;}
+.task-body .tn{font-size:13px;font-weight:500;}
+.task-body .tn.done{text-decoration:line-through;color:var(--sub);}
+.task-body .tm{font-size:11px;color:var(--sub);margin-top:2px;display:flex;gap:6px;}
+.tag{display:inline-block;padding:1px 6px;border-radius:4px;font-size:10px;font-weight:600;}
+.tag.nora{background:#eef1ff;color:var(--primary);}
+.tag.sage{background:#e6fdf3;color:#059669;}
+.tag.elle{background:#fff7e6;color:#d97706;}
+.task-add-row{display:flex;gap:8px;margin-top:12px;padding-top:12px;border-top:1px solid var(--border);}
+.task-add-row input{flex:1;border:1px solid var(--border);border-radius:7px;padding:7px 11px;font-size:13px;outline:none;font-family:inherit;}
+.task-add-row input:focus{border-color:var(--primary);}
+.task-add-row select{border:1px solid var(--border);border-radius:7px;padding:7px 10px;font-size:13px;outline:none;background:var(--card);color:var(--text);}
+.btn-sm{background:var(--primary);color:#fff;border:none;border-radius:7px;padding:7px 14px;font-size:13px;font-weight:600;cursor:pointer;}
+
+/* Projects */
+.proj-item{margin-bottom:14px;}
+.proj-item:last-child{margin-bottom:0;}
+.proj-hd{display:flex;justify-content:space-between;font-size:13px;margin-bottom:5px;}
+.proj-hd .l{font-weight:500;}
+.proj-hd .p{color:var(--sub);}
+.proj-bar{height:6px;background:var(--border);border-radius:3px;overflow:hidden;}
+.proj-fill{height:100%;border-radius:3px;transition:width .6s ease;}
+.proj-fill.blue{background:var(--primary);}
+.proj-fill.green{background:var(--ok);}
+.proj-fill.yellow{background:var(--warn);}
+.proj-fill.purple{background:#8b5cf6;}
+
+/* System status */
+.bot-status-card{background:var(--card);border:1px solid var(--border);border-radius:var(--radius);padding:20px 24px;display:flex;align-items:center;gap:16px;box-shadow:var(--shadow);}
+.bot-av{width:52px;height:52px;border-radius:13px;display:flex;align-items:center;justify-content:center;font-size:24px;flex-shrink:0;}
+.bot-av.nora{background:#eef1ff;}
+.bot-av.sage{background:#e6fdf3;}
+.bot-av.elle{background:#fff7e6;}
+.bot-info{flex:1;}
+.bot-name{font-size:15px;font-weight:700;margin-bottom:2px;}
+.bot-meta{font-size:12px;color:var(--sub);}
+.bot-pill{display:flex;align-items:center;gap:6px;padding:5px 12px;border-radius:20px;font-size:12px;font-weight:600;}
+.bot-pill.online{background:#f0fdf4;border:1px solid #bbf7d0;color:#15803d;}
+.bot-pill.offline{background:#fef2f2;border:1px solid #fecaca;color:#dc2626;}
+.bot-pill.unknown{background:#f9fafb;border:1px solid var(--border);color:var(--sub);}
+.bot-pill .dot{width:6px;height:6px;border-radius:50%;}
+.bot-pill.online .dot{background:#22c55e;}
+.bot-pill.offline .dot{background:#ef4444;}
+.bot-pill.unknown .dot{background:#9ca3af;}
+
+/* Period tabs */
+.period-tabs{display:flex;gap:4px;background:#f3f4f6;border-radius:10px;padding:4px;}
+.p-tab{padding:6px 16px;border-radius:7px;font-size:13px;font-weight:500;cursor:pointer;color:var(--sub);transition:.15s;border:none;background:transparent;}
+.p-tab.active{background:#fff;color:var(--text);font-weight:600;box-shadow:0 1px 3px rgba(0,0,0,.08);}
+.p-tab:hover:not(.active){color:var(--text);}
+
+/* Bar chart */
+.bar-chart{display:flex;align-items:flex-end;gap:6px;height:80px;padding-bottom:0;}
+.bar-col{display:flex;flex-direction:column;align-items:center;flex:1;gap:4px;}
+.bar-wrap{flex:1;display:flex;align-items:flex-end;width:100%;}
+.bar{width:100%;border-radius:4px 4px 0 0;transition:height .4s ease;min-height:2px;}
+.bar.has-data{background:var(--primary);}
+.bar.empty{background:var(--border);}
+.bar.today-bar{background:#8b5cf6;}
+.bar-label{font-size:10px;color:var(--sub);white-space:nowrap;}
+.bar-val{font-size:10px;color:var(--sub);font-weight:600;}
+
+/* Key status */
+.key-row{display:flex;align-items:center;gap:10px;padding:12px 0;border-bottom:1px solid var(--border);}
+.key-row:last-child{border-bottom:none;}
+.key-label{font-size:13px;font-weight:600;width:120px;flex-shrink:0;}
+.key-val{flex:1;font-family:monospace;font-size:12px;color:var(--sub);background:#f9fafb;padding:5px 10px;border-radius:6px;}
+.key-badge{font-size:11px;font-weight:600;padding:3px 8px;border-radius:10px;}
+.key-badge.ok{background:#f0fdf4;color:#15803d;}
+.key-badge.off{background:#fef2f2;color:#dc2626;}
+
+/* Badge */
+.model-badge{display:inline-block;padding:2px 7px;border-radius:4px;font-size:10px;font-weight:700;}
+.model-badge.deepseek{background:#eff6ff;color:#1d4ed8;}
+.model-badge.claude{background:#fdf4ff;color:#7e22ce;}
+.agent-dot{display:inline-block;width:8px;height:8px;border-radius:50%;margin-right:4px;}
+.agent-dot.nora{background:var(--primary);}
+.agent-dot.sage{background:var(--ok);}
+.agent-dot.elle{background:var(--warn);}
+
+/* Log table */
+.log-table{width:100%;border-collapse:collapse;font-size:12px;}
+.log-table th{text-align:left;padding:8px 10px;font-weight:600;color:var(--sub);border-bottom:2px solid var(--border);white-space:nowrap;}
+.log-table td{padding:7px 10px;border-bottom:1px solid var(--border);vertical-align:middle;}
+.log-table tr:last-child td{border-bottom:none;}
+.log-table tr:hover td{background:#f9fafb;}
+
+/* Live dot */
+.live-dot{width:7px;height:7px;border-radius:50%;background:var(--ok);display:inline-block;animation:pulse 2s infinite;}
+@keyframes pulse{0%,100%{opacity:1;}50%{opacity:.3;}}
+
+/* Toast & Modal */
+.toast{position:fixed;top:16px;right:16px;padding:11px 18px;border-radius:8px;color:#fff;font-size:13px;z-index:999;opacity:0;transform:translateY(-8px);transition:.25s;pointer-events:none;}
+.toast.show{opacity:1;transform:translateY(0);}
+.toast.ok{background:var(--ok);}
+.toast.err{background:var(--bad);}
+.overlay{position:fixed;inset:0;background:rgba(0,0,0,.45);z-index:100;display:none;align-items:center;justify-content:center;}
+.overlay.show{display:flex;}
+.modal{background:#fff;border-radius:16px;padding:28px;width:460px;max-width:90vw;box-shadow:0 20px 60px rgba(0,0,0,.18);}
+.modal h2{font-size:17px;font-weight:700;margin-bottom:20px;}
+.m-row{margin-bottom:14px;}
+.m-row label{display:block;font-size:12px;font-weight:600;color:var(--sub);margin-bottom:5px;}
+.m-row input{width:100%;border:1px solid var(--border);border-radius:8px;padding:9px 12px;font-size:13px;outline:none;font-family:inherit;}
+.m-row input:focus{border-color:var(--primary);}
+.m-acts{display:flex;justify-content:flex-end;gap:8px;margin-top:20px;}
+.btn-ghost{background:transparent;border:1px solid var(--border);border-radius:8px;padding:8px 18px;font-size:13px;cursor:pointer;}
+.btn-pri{background:var(--primary);color:#fff;border:none;border-radius:8px;padding:8px 18px;font-size:13px;font-weight:600;cursor:pointer;}
+.m-tip{font-size:11px;color:var(--sub);margin-top:4px;}
+</style>
+</head>
+<body>
+
+<div class="topbar">
+  <div class="topbar-left">
+    <svg width="34" height="34" viewBox="0 0 48 48" fill="none" xmlns="http://www.w3.org/2000/svg" style="flex-shrink:0;">
+      <defs>
+        <linearGradient id="stG" x1="0" y1="0" x2="1" y2="1">
+          <stop offset="0" stop-color="#FF7A59"/>
+          <stop offset="1" stop-color="#FFAC8E"/>
+        </linearGradient>
+        <linearGradient id="brG" x1="0" y1="0" x2="1" y2="0">
+          <stop offset="0" stop-color="#2C3154"/>
+          <stop offset="1" stop-color="#FF7A59"/>
+        </linearGradient>
+      </defs>
+      <!-- 连接桥（深蓝→橙渐变） -->
+      <path d="M 16 24 Q 28 17 35 24 Q 28 31 16 24 Z" fill="url(#brG)"/>
+      <!-- 深蓝圆点 -->
+      <circle cx="16" cy="24" r="9.5" fill="#2C3154"/>
+      <!-- 橙色四角星芒 -->
+      <path d="M 33 12 Q 35 22 44 24 Q 35 26 33 36 Q 31 26 22 24 Q 31 22 33 12 Z" fill="url(#stG)"/>
+    </svg>
+    <h1>Sue Tech</h1>
+  </div>
+  <div class="topbar-right">
+    <div class="status-pill"><span class="dot"></span> 全员在线</div>
+    <span id="live-clock"></span>
+  </div>
+</div>
+
+<div class="shell">
+<div class="sidebar">
+  <div class="section">
+    <div class="section-label">导航</div>
+    <div class="s-item active" id="nav-overview" onclick="showPage('overview')">
+      <span class="s-icon">🏠</span><span class="s-name">总览</span>
+    </div>
+    <div class="s-item" id="nav-status" onclick="showPage('status')">
+      <span class="s-icon">📡</span><span class="s-name">系统状态</span>
+    </div>
+  </div>
+  <div class="s-divider"></div>
+  <div class="section">
+    <div class="section-label">Agent 团队</div>
+    <div class="s-item" id="nav-nora" onclick="showPage('chat','nora')">
+      <span class="s-icon">📋</span><span class="s-name">Nora</span>
+      <span class="s-tag">CEO</span><span class="s-badge"></span>
+    </div>
+    <div class="s-item" id="nav-sage" onclick="showPage('chat','sage')">
+      <span class="s-icon">💻</span><span class="s-name">Sage</span>
+      <span class="s-tag">工程师</span><span class="s-badge"></span>
+    </div>
+    <div class="s-item" id="nav-elle" onclick="showPage('chat','elle')">
+      <span class="s-icon">⚖️</span><span class="s-name">Elle</span>
+      <span class="s-tag">法律</span><span class="s-badge"></span>
+    </div>
+  </div>
+  <div class="s-divider"></div>
+  <div class="section">
+    <div class="section-label">AI 模型</div>
+    <div id="model-list"></div>
+  </div>
+  <div class="s-divider"></div>
+  <div class="section">
+    <div class="section-label">管理</div>
+    <div class="s-item" id="nav-usage" onclick="showPage('usage')">
+      <span class="s-icon">📊</span><span class="s-name">API 用量</span>
+    </div>
+    <div class="s-item" id="nav-results" onclick="showPage('results')">
+      <span class="s-icon">🔗</span><span class="s-name">共享数据</span>
+    </div>
+    <div class="s-item" onclick="openCfg()">
+      <span class="s-icon">⚙️</span><span class="s-name">API 配置</span>
+    </div>
+  </div>
+</div>
+
+<div class="main" id="main">
+
+  <!-- ═══ 总览页 ═══ -->
+  <div id="page-overview">
+    <div class="page-hd" style="margin-bottom:20px;">
+      <div><h2>公司总览</h2><div class="sub">Sue Tech · 一人公司 AI 运营系统</div></div>
+    </div>
+    <div class="grid-3" style="margin-bottom:16px;">
+      <div class="agent-card" onclick="showPage('chat','nora')">
+        <div class="agent-av nora">📋</div>
+        <div class="agent-info"><div class="agent-name">Nora</div><div class="agent-role">CEO · 总管协调</div></div>
+        <div class="agent-online"><span class="dot"></span> 在线</div>
+      </div>
+      <div class="agent-card" onclick="showPage('chat','sage')">
+        <div class="agent-av sage">💻</div>
+        <div class="agent-info"><div class="agent-name">Sage</div><div class="agent-role">首席工程师</div></div>
+        <div class="agent-online"><span class="dot"></span> 在线</div>
+      </div>
+      <div class="agent-card" onclick="showPage('chat','elle')">
+        <div class="agent-av elle">⚖️</div>
+        <div class="agent-info"><div class="agent-name">Elle</div><div class="agent-role">法律顾问</div></div>
+        <div class="agent-online"><span class="dot"></span> 在线</div>
+      </div>
+    </div>
+    <div class="grid-2">
+      <div class="card">
+        <div class="card-hd"><span class="title">✅ 待办任务</span></div>
+        <div id="ov-tasks"></div>
+        <div class="task-add-row">
+          <input id="ov-new-task" placeholder="添加任务...">
+          <select id="ov-new-agent"><option value="nora">Nora</option><option value="sage">Sage</option><option value="elle">Elle</option></select>
+          <button class="btn-sm" onclick="addTask()">+</button>
+        </div>
+      </div>
+      <div class="card">
+        <div class="card-hd"><span class="title">📈 项目进展</span></div>
+        <div id="ov-projects"></div>
+      </div>
+    </div>
+  </div>
+
+  <!-- ═══ 系统状态页 ═══ -->
+  <div id="page-status" style="display:none;">
+    <div class="page-hd" style="margin-bottom:20px;">
+      <div><h2>系统状态</h2><div class="sub">飞书 Bot 实时运行情况</div></div>
+      <button class="btn-ghost" onclick="loadStatus()" style="font-size:13px;">🔄 刷新</button>
+    </div>
+    <div style="display:flex;flex-direction:column;gap:12px;margin-bottom:24px;" id="bot-status-list">
+      <div style="color:var(--sub);font-size:13px;">加载中...</div>
+    </div>
+    <div class="grid-2">
+      <div class="card">
+        <div class="card-hd"><span class="title">📊 Agent 调用分布</span></div>
+        <div id="agent-breakdown"></div>
+      </div>
+      <div class="card">
+        <div class="card-hd"><span class="title">🤖 模型使用分布</span></div>
+        <div id="model-breakdown"></div>
+      </div>
+    </div>
+  </div>
+
+  <!-- ═══ 对话页 ═══ -->
+  <div id="page-chat" style="display:none;">
+    <div class="chat-view">
+      <div class="chat-hd">
+        <div class="c-av nora" id="chat-av">📋</div>
+        <div><div class="c-name" id="chat-name">Nora</div><div class="c-role" id="chat-role">CEO · 总管协调</div></div>
+        <div style="margin-left:auto;display:flex;align-items:center;gap:12px;">
+          <label style="display:flex;align-items:center;gap:6px;cursor:pointer;font-size:12px;color:var(--sub);" title="开启后由 Nora→Sage/Elle 多 Agent 协作">
+            <span id="crew-label">单 Agent</span>
+            <div onclick="toggleCrew()" id="crew-toggle" style="width:36px;height:20px;border-radius:10px;background:#d1d5db;position:relative;cursor:pointer;transition:.2s;flex-shrink:0;">
+              <div id="crew-knob" style="width:16px;height:16px;border-radius:50%;background:#fff;position:absolute;top:2px;left:2px;transition:.2s;box-shadow:0 1px 3px rgba(0,0,0,.2);"></div>
+            </div>
+          </label>
+          <span style="display:flex;align-items:center;gap:5px;font-size:12px;color:var(--ok);"><span style="width:7px;height:7px;border-radius:50%;background:var(--ok);display:inline-block;"></span> 在线</span>
+        </div>
+      </div>
+      <div class="chat-msgs" id="chat-msgs"></div>
+      <div class="chat-inp-wrap">
+        <input type="text" class="chat-inp" id="chat-inp" placeholder="输入消息..." onkeydown="if(event.key==='Enter' && !event.isComposing)sendMsg()">
+        <button class="btn-send" id="btn-send" onclick="sendMsg()">发送</button>
+      </div>
+    </div>
+  </div>
+
+  <!-- ═══ API 用量页 ═══ -->
+  <div id="page-usage" style="display:none;">
+    <div class="page-hd" style="margin-bottom:20px;">
+      <div>
+        <h2>API 用量</h2>
+        <div class="sub" style="display:flex;align-items:center;gap:6px;margin-top:2px;">
+          <span class="live-dot"></span>
+          <span id="usage-updated">实时更新中...</span>
+        </div>
+      </div>
+      <div class="period-tabs" id="period-tabs">
+        <button class="p-tab active" data-p="today" onclick="setPeriod('today')">今天</button>
+        <button class="p-tab" data-p="week"  onclick="setPeriod('week')">本周</button>
+        <button class="p-tab" data-p="month" onclick="setPeriod('month')">本月</button>
+        <button class="p-tab" data-p="all"   onclick="setPeriod('all')">全部</button>
+      </div>
+    </div>
+
+    <!-- 4 个统计卡 -->
+    <div class="grid-4" style="margin-bottom:20px;">
+      <div class="stat-tile" id="tile-balance">
+        <div class="st-label">💰 DeepSeek 余额</div>
+        <div class="st-val" id="u-balance">—</div>
+        <div class="st-sub" id="u-balance-sub">查询中...</div>
+      </div>
+      <div class="stat-tile">
+        <div class="st-label">📞 调用次数</div>
+        <div class="st-val" id="u-calls">—</div>
+        <div class="st-sub" id="u-calls-sub">—</div>
+      </div>
+      <div class="stat-tile">
+        <div class="st-label">🔤 Token 用量</div>
+        <div class="st-val" id="u-tokens">—</div>
+        <div class="st-sub">输入 + 输出</div>
+      </div>
+      <div class="stat-tile">
+        <div class="st-label">💸 预估费用</div>
+        <div class="st-val" id="u-cost">—</div>
+        <div class="st-sub">人民币（估算值）</div>
+      </div>
+    </div>
+
+    <!-- 7天趋势图 + 余额详情 -->
+    <div class="grid-2" style="margin-bottom:20px;">
+      <div class="card">
+        <div class="card-hd">
+          <span class="title">📅 最近 7 天趋势</span>
+          <span style="font-size:11px;color:var(--sub);">按调用次数</span>
+        </div>
+        <div class="bar-chart" id="bar-chart"></div>
+        <div id="bar-legend" style="display:flex;gap:16px;margin-top:12px;flex-wrap:wrap;"></div>
+      </div>
+      <div class="card">
+        <div class="card-hd">
+          <span class="title">💳 余额详情</span>
+          <button class="btn-xs" onclick="refreshBalance()">🔄 刷新</button>
+        </div>
+        <div id="balance-detail" style="color:var(--sub);font-size:13px;">加载中...</div>
+        <div class="card-hd" style="margin-top:16px;margin-bottom:12px;"><span class="title">🔑 密钥状态</span></div>
+        <div id="key-status"></div>
+      </div>
+    </div>
+
+    <!-- 调用记录表 -->
+    <div class="card">
+      <div class="card-hd">
+        <span class="title">📋 调用记录</span>
+        <span style="font-size:11px;color:var(--sub);">本地数据库 · 不含密钥</span>
+      </div>
+      <div style="overflow-x:auto;" id="log-wrap">
+        <div style="color:var(--sub);font-size:13px;">加载中...</div>
+      </div>
+    </div>
+  </div>
+
+  <!-- ═══ 共享数据页 ═══ -->
+  <div id="page-results" style="display:none;">
+    <div class="page-hd" style="margin-bottom:20px;">
+      <div><h2>🔗 跨 Bot 共享数据</h2><div class="sub">Nora · Sage · Elle 数据互通面板</div></div>
+    </div>
+
+    <!-- 统计卡片 -->
+    <div class="grid-3" style="margin-bottom:16px;" id="results-stats"></div>
+
+    <!-- 结果列表 + 共享上下文 -->
+    <div class="grid-2" style="margin-bottom:20px;">
+      <div class="card">
+        <div class="card-hd">
+          <span class="title">📋 处理结果</span>
+          <select id="results-bot-filter" onchange="loadResults()" style="border:1px solid var(--border);border-radius:6px;padding:4px 10px;font-size:12px;outline:none;">
+            <option value="">全部 Bot</option>
+            <option value="nora">Nora</option>
+            <option value="sage">Sage</option>
+            <option value="elle">Elle</option>
+          </select>
+        </div>
+        <div id="results-list" style="max-height:500px;overflow-y:auto;color:var(--sub);font-size:13px;">加载中...</div>
+      </div>
+      <div class="card">
+        <div class="card-hd">
+          <span class="title">💬 共享上下文</span>
+          <button class="btn-xs" onclick="loadContext()">🔄 刷新</button>
+        </div>
+        <div id="context-list" style="max-height:500px;overflow-y:auto;color:var(--sub);font-size:13px;">加载中...</div>
+      </div>
+    </div>
+  </div>
+
+</div>
+</div>
+
+<!-- API 配置弹窗 -->
+<div class="overlay" id="overlay" onclick="if(event.target===this)closeCfg()">
+  <div class="modal">
+    <h2>⚙️ API 配置</h2>
+    <div class="m-row">
+      <label>DeepSeek API Key</label>
+      <input type="password" id="cfg-ds" placeholder="留空表示不修改">
+      <div class="m-tip">🔒 只存在服务器本地，页面仅展示脱敏版本</div>
+    </div>
+    <div class="m-row">
+      <label>DeepSeek Base URL</label>
+      <input type="text" id="cfg-ds-url" value="https://api.deepseek.com">
+    </div>
+    <div class="m-row">
+      <label>Anthropic API Key（Sage 专用）</label>
+      <input type="password" id="cfg-ant" placeholder="留空表示不修改">
+    </div>
+    <div class="m-row">
+      <label>Anthropic Model</label>
+      <input type="text" id="cfg-ant-mdl" value="claude-sonnet-4-6">
+    </div>
+    <div class="m-acts">
+      <button class="btn-ghost" onclick="closeCfg()">取消</button>
+      <button class="btn-pri" onclick="saveCfg()">保存</button>
+    </div>
+  </div>
+</div>
+<div class="toast" id="toast"></div>
+
+<script>
+var API='/api';
+var curAgent='nora';
+var allTasks=[];
+var modelsData=null;
+var crewMode=false;
+var curPeriod='today';
+var usageTimer=null;
+var balanceData=null;
+
+var agentMeta={
+  nora:{name:'Nora',role:'CEO · 总管协调',av:'📋',cls:'nora',greeting:'你好，我是 Nora，Sue Tech 的 CEO 总管。有什么需要我处理？'},
+  sage:{name:'Sage',role:'首席工程师',av:'💻',cls:'sage',greeting:'你好，我是 Sage，负责所有技术工作。有代码或技术问题找我。'},
+  elle:{name:'Elle',role:'法律顾问',av:'⚖️',cls:'elle',greeting:'你好，我是 Elle，专注法律事务。合同或法律问题可以来问我。'},
+};
+
+/* ── 工具 ── */
+function tick(){document.getElementById('live-clock').textContent=new Date().toLocaleString('zh-CN',{year:'numeric',month:'long',day:'numeric',weekday:'short',hour:'2-digit',minute:'2-digit',second:'2-digit'});}
+tick();setInterval(tick,1000);
+
+function toast(m,c){var e=document.getElementById('toast');e.textContent=m;e.className='toast '+(c||'ok')+' show';setTimeout(function(){e.classList.remove('show');},2500);}
+function esc(s){return String(s||'').replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;');}
+async function api(u,o){var r=await fetch(u,o||{});if(!r.ok){var d=await r.json().catch(function(){return{};});throw new Error(d.detail||r.statusText);}return r.json();}
+
+function fmtTok(n){n=n||0;if(n>=1000000)return(n/1000000).toFixed(1)+'M';if(n>=1000)return Math.round(n/1000)+'K';return n.toLocaleString();}
+
+/* ── 导航 ── */
+function showPage(p,a){
+  ['overview','status','chat','usage','results'].forEach(function(id){
+    var el=document.getElementById('page-'+id);if(el)el.style.display='none';
+  });
+  var pg=document.getElementById('page-'+p);if(pg)pg.style.display='';
+  document.querySelectorAll('.s-item').forEach(function(e){e.classList.remove('active');});
+  var nav=document.getElementById('nav-'+p);if(nav)nav.classList.add('active');
+
+  if(p==='chat'){
+    if(nav)nav.classList.remove('active');
+    var na=document.getElementById('nav-'+a);if(na)na.classList.add('active');
+    curAgent=a;var m=agentMeta[a];
+    var av=document.getElementById('chat-av');av.textContent=m.av;av.className='c-av '+m.cls;
+    document.getElementById('chat-name').textContent=m.name;
+    document.getElementById('chat-role').textContent=m.role;
+    document.getElementById('chat-inp').placeholder='向 '+m.name+' 发送消息...';
+    loadChat();document.getElementById('chat-inp').focus();
+    if(usageTimer){clearInterval(usageTimer);usageTimer=null;}
+  } else if(p==='status'){
+    loadStatus();
+    if(usageTimer){clearInterval(usageTimer);usageTimer=null;}
+  } else if(p==='usage'){
+    loadUsagePage();
+    if(usageTimer)clearInterval(usageTimer);
+    usageTimer=setInterval(function(){loadUsageSummary();},30000);
+  } else if(p==='results'){
+    loadResults();
+    loadContext();
+    if(usageTimer){clearInterval(usageTimer);usageTimer=null;}
+  } else {
+    if(usageTimer){clearInterval(usageTimer);usageTimer=null;}
+  }
+}
+
+/* ── Chat ── */
+/* 聊天记录来自服务器统一数据池（飞书 + 网页合并），不再用 localStorage */
+async function loadChat(){
+  var el=document.getElementById('chat-msgs');var m=agentMeta[curAgent];
+  el.innerHTML='<div class="msg agent">'+esc(m.greeting)+'</div>'+
+    '<div class="chat-src">正在加载历史记录...</div>';
+  try{
+    var d=await api(API+'/results?bot='+curAgent+'&limit=40');
+    var rows=(d.results||[]).slice().reverse(); // 旧 → 新
+    var html='<div class="msg agent">'+esc(m.greeting)+'</div>';
+    if(!rows.length){
+      html+='<div class="chat-src">暂无历史记录，开始对话吧</div>';
+    }
+    rows.forEach(function(r){
+      var isFeishu=(r.source||'').indexOf('feishu')>=0;
+      var t=(r.timestamp||'').slice(5,16).replace('T',' ');
+      html+='<div class="chat-src">'+(isFeishu?'📱 来自飞书':'💻 来自网页')+' · '+t+'</div>';
+      html+='<div class="msg user">'+esc(r.input||'')+'</div>';
+      html+='<div class="msg agent">'+esc(r.output||'')+'</div>';
+    });
+    el.innerHTML=html;
+  }catch(e){
+    el.innerHTML='<div class="msg agent">'+esc(m.greeting)+'</div>'+
+      '<div class="chat-src" style="color:var(--bad);">历史记录加载失败：'+esc(e.message)+'</div>';
+  }
+  el.scrollTop=el.scrollHeight;
+}
+function addMsg(r,t){var el=document.getElementById('chat-msgs');var d=document.createElement('div');d.className='msg '+r;d.textContent=t;el.appendChild(d);el.scrollTop=el.scrollHeight;}
+function sT(){var el=document.getElementById('chat-msgs');var d=document.createElement('div');d.className='msg-typing';d.id='tp';d.innerHTML='<span></span><span></span><span></span>';el.appendChild(d);el.scrollTop=el.scrollHeight;}
+function hT(){var e=document.getElementById('tp');if(e)e.remove();}
+
+function toggleCrew(){
+  crewMode=!crewMode;
+  var t=document.getElementById('crew-toggle'),k=document.getElementById('crew-knob'),l=document.getElementById('crew-label');
+  t.style.background=crewMode?'var(--primary)':'#d1d5db';
+  k.style.left=crewMode?'18px':'2px';
+  l.textContent=crewMode?'多 Agent':'单 Agent';
+  toast(crewMode?'🤖 多 Agent 协作模式':'💬 单 Agent 模式',crewMode?'ok':'');
+}
+
+async function sendMsg(){
+  var inp=document.getElementById('chat-inp'),btn=document.getElementById('btn-send'),txt=inp.value.trim();
+  if(!txt)return;
+  inp.value='';inp.disabled=btn.disabled=true;addMsg('user',txt);sT();
+  try{
+    var url=crewMode?API+'/crew/chat':API+'/chat/'+curAgent;
+    var r=await api(url,{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({message:txt})});
+    hT();
+    addMsg('agent',(crewMode?'[Nora · 多Agent协作]\n':'')+r.response);
+  }catch(e){hT();addMsg('agent','抱歉：'+e.message);toast('发送失败','err');}
+  inp.disabled=btn.disabled=false;inp.focus();
+}
+
+/* ── Tasks ── */
+async function loadTasks(){
+  try{allTasks=await api(API+'/tasks');renderTasks();}
+  catch(e){document.getElementById('ov-tasks').innerHTML='<div style="color:var(--sub);font-size:13px;">暂无任务</div>';}
+}
+function renderTasks(){
+  var p=allTasks.filter(function(t){return t.status!=='done';}).slice(0,6);
+  var el=document.getElementById('ov-tasks');
+  el.innerHTML=p.length?p.map(function(t){
+    return'<div class="task-item"><div class="task-chk" onclick="doneTask('+t.id+')"></div><div class="task-body"><div class="tn">'+esc(t.title)+'</div><div class="tm"><span class="tag '+t.agent+'">'+(t.agent==='nora'?'Nora':t.agent==='sage'?'Sage':'Elle')+'</span>'+esc(t.date)+'</div></div></div>';
+  }).join(''):'<div style="color:var(--sub);font-size:13px;padding:6px 0;">暂无待办 ✨</div>';
+}
+async function doneTask(id){try{await api(API+'/tasks/'+id,{method:'PATCH',headers:{'Content-Type':'application/json'},body:JSON.stringify({status:'done'})});loadTasks();toast('已完成');}catch(e){}}
+async function addTask(){
+  var inp=document.getElementById('ov-new-task'),title=inp.value.trim();if(!title)return;
+  var ag=document.getElementById('ov-new-agent').value;
+  try{await api(API+'/tasks',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({title:title,agent:ag})});inp.value='';loadTasks();toast('已添加');}catch(e){}
+}
+
+/* ── Projects ── */
+var dp=[{name:'飞书 Agent 部署',progress:100,color:'green'},{name:'Multi-Agent 开发',progress:80,color:'blue'},{name:'Dashboard 优化',progress:70,color:'yellow'},{name:'官网建设',progress:15,color:'purple'}];
+async function loadProjects(){
+  try{var p=await api(API+'/projects');if(!p||!p.length)p=dp;
+    document.getElementById('ov-projects').innerHTML=p.map(function(x){
+      return'<div class="proj-item"><div class="proj-hd"><span class="l">'+esc(x.name)+'</span><span class="p">'+x.progress+'%</span></div><div class="proj-bar"><div class="proj-fill '+x.color+'" style="width:'+x.progress+'%"></div></div></div>';
+    }).join('');
+  }catch(e){document.getElementById('ov-projects').innerHTML=dp.map(function(x){return'<div class="proj-item"><div class="proj-hd"><span class="l">'+x.name+'</span><span class="p">'+x.progress+'%</span></div><div class="proj-bar"><div class="proj-fill '+x.color+'" style="width:'+x.progress+'%"></div></div></div>';}).join('');}
+}
+
+/* ── 模型侧边栏 ── */
+async function loadModels(){
+  try{modelsData=await api(API+'/models');
+    document.getElementById('model-list').innerHTML=modelsData.models.map(function(m){
+      var active=m.id===modelsData.active,disabled=!m.configured;
+      return'<div class="s-model'+(active?' sel':'')+(disabled?' disabled':'')+'" style="'+(disabled?'opacity:0.4;cursor:default;':'')+'" '+
+        (disabled?'':'onclick="swModel(\''+m.id+'\')"')+'>'+
+        '<span class="m-dot"></span>'+
+        '<span style="font-size:12.5px;line-height:1.4;">'+(disabled?'🔒 ':'')+esc(m.name)+
+        '<br><span style="font-size:10px;opacity:.6;">'+esc(m.provider||'')+'</span></span></div>';
+    }).join('');
+  }catch(e){}
+}
+async function swModel(id){
+  if(!modelsData||id===modelsData.active)return;
+  var m=modelsData.models.find(function(x){return x.id===id;});
+  if(m&&!m.configured){toast('该模型未配置 API Key','err');return;}
+  try{modelsData=await api(API+'/models/switch',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({active:id})});loadModels();toast('已切换到 '+(m?m.name:id));}
+  catch(e){toast('切换失败','err');}
+}
+
+/* ── 系统状态页 ── */
+async function loadStatus(){
+  try{
+    var d=await api(API+'/system-status');
+    var cls={nora:'nora',sage:'sage',elle:'elle'};
+    var icons={nora:'📋',sage:'💻',elle:'⚖️'};
+    var roles={nora:'CEO · 飞书Bot',sage:'工程师 · 飞书Bot',elle:'法律顾问 · 飞书Bot'};
+    document.getElementById('bot-status-list').innerHTML=d.bots.map(function(b){
+      var uptime='';
+      if(b.uptime){var sec=Math.floor((Date.now()-b.uptime)/1000);uptime=sec<3600?Math.floor(sec/60)+'分钟':Math.floor(sec/3600)+'小时';}
+      return'<div class="bot-status-card">'+
+        '<div class="bot-av '+cls[b.name]+'">'+icons[b.name]+'</div>'+
+        '<div class="bot-info"><div class="bot-name">'+(b.name==='nora'?'Nora':b.name==='sage'?'Sage':'Elle')+'</div>'+
+        '<div class="bot-meta">'+roles[b.name]+(b.memory_mb?' · '+b.memory_mb+'MB':'')+(uptime?' · 运行 '+uptime:'')+'</div></div>'+
+        '<div class="bot-pill '+b.status+'"><span class="dot"></span>'+(b.status==='online'?'在线':b.status==='offline'?'离线':'未知')+'</div></div>';
+    }).join('');
+  }catch(e){document.getElementById('bot-status-list').innerHTML='<div style="color:var(--bad);font-size:13px;">查询失败：'+e.message+'</div>';}
+  try{
+    var logs=await api(API+'/api-logs?limit=1');
+    var byAgent=logs.by_agent||[];
+    var byModel=logs.by_model||[];
+    document.getElementById('agent-breakdown').innerHTML=byAgent.length?byAgent.map(function(a){
+      return'<div style="display:flex;justify-content:space-between;padding:8px 0;border-bottom:1px solid var(--border);font-size:13px;">'+
+        '<span><span class="agent-dot '+a.agent+'"></span>'+a.agent+'</span>'+
+        '<span style="color:var(--sub);">'+a.calls+' 次 · ¥'+a.cost_cny.toFixed(2)+'</span></div>';
+    }).join(''):'<div style="color:var(--sub);font-size:13px;padding:8px 0;">暂无数据</div>';
+    document.getElementById('model-breakdown').innerHTML=byModel.length?byModel.map(function(m){
+      var c=m.model.includes('claude');
+      return'<div style="display:flex;justify-content:space-between;padding:8px 0;border-bottom:1px solid var(--border);font-size:13px;">'+
+        '<span><span class="model-badge '+(c?'claude':'deepseek')+'">'+m.model.split('-').slice(-2).join('-')+'</span></span>'+
+        '<span style="color:var(--sub);">'+m.calls+' 次 · ¥'+m.cost_cny.toFixed(2)+'</span></div>';
+    }).join(''):'<div style="color:var(--sub);font-size:13px;padding:8px 0;">暂无数据</div>';
+  }catch(e){}
+}
+
+/* ── API 用量页 ── */
+function setPeriod(p){
+  curPeriod=p;
+  document.querySelectorAll('.p-tab').forEach(function(t){
+    t.classList.toggle('active',t.dataset.p===p);
+  });
+  loadUsageSummary();
+}
+
+async function loadUsagePage(){
+  await Promise.all([loadUsageSummary(),refreshBalance(),loadApiLogs()]);
+}
+
+async function loadUsageSummary(){
+  try{
+    var d=await api(API+'/usage-summary');
+    // 更新时间
+    var t=new Date(d.updated_at);
+    document.getElementById('usage-updated').textContent='上次更新：'+t.toLocaleTimeString('zh-CN');
+    // 根据选择的时间段显示数据
+    var pd=curPeriod==='all'?d.all:d[curPeriod];
+    document.getElementById('u-calls').textContent=(pd.total_calls||0).toLocaleString();
+    document.getElementById('u-calls-sub').textContent=
+      curPeriod==='today'?'今天':curPeriod==='week'?'近 7 天':curPeriod==='month'?'本月':'累计全部';
+    document.getElementById('u-tokens').textContent=fmtTok(pd.total_tokens||pd.total_tokens);
+    document.getElementById('u-cost').textContent='¥'+(pd.total_cost_cny||0).toFixed(2);
+    // 7天柱状图
+    renderBarChart(d.daily||[]);
+  }catch(e){
+    document.getElementById('usage-updated').textContent='更新失败：'+e.message;
+  }
+}
+
+function renderBarChart(daily){
+  var max=Math.max.apply(null,daily.map(function(d){return d.calls||0;}));
+  if(max===0)max=1;
+  var today=new Date().toISOString().substr(0,10);
+  var html=daily.map(function(d){
+    var pct=Math.max(4,Math.round((d.calls/max)*100));
+    var isToday=d.date===today;
+    var label=d.date.substr(5); // MM-DD
+    return'<div class="bar-col">'+
+      '<div class="bar-val">'+(d.calls||'')+'</div>'+
+      '<div class="bar-wrap"><div class="bar '+(d.calls>0?(isToday?'today-bar':'has-data'):'empty')+'" style="height:'+pct+'%;"></div></div>'+
+      '<div class="bar-label" style="'+(isToday?'color:var(--primary);font-weight:600;':'')+'">'+label+'</div>'+
+    '</div>';
+  }).join('');
+  document.getElementById('bar-chart').innerHTML=html;
+  // 图例：本周总费用
+  var totalCost=daily.reduce(function(s,d){return s+(d.cost_cny||0);},0);
+  var totalCalls=daily.reduce(function(s,d){return s+(d.calls||0);},0);
+  document.getElementById('bar-legend').innerHTML=
+    '<span style="font-size:12px;color:var(--sub);">近 7 天 · '+totalCalls+' 次调用 · 预估 ¥'+totalCost.toFixed(2)+'</span>'+
+    '<span style="font-size:12px;margin-left:auto;"><span style="display:inline-block;width:8px;height:8px;border-radius:2px;background:#8b5cf6;margin-right:4px;"></span>今天</span>';
+}
+
+async function refreshBalance(){
+  document.getElementById('u-balance').textContent='查询中';
+  document.getElementById('u-balance-sub').textContent='...';
+  try{
+    var b=await api(API+'/balance');
+    balanceData=b;
+    if(b.error){
+      document.getElementById('u-balance').textContent='失败';
+      document.getElementById('u-balance-sub').textContent=b.error;
+      document.getElementById('balance-detail').innerHTML='<div style="color:var(--bad);font-size:13px;">'+esc(b.error)+'</div>';
+      return;
+    }
+    var total=b.total_balance||0;
+    // 余额按 CNY 国际标准：显示 2 位小数
+    var valStr='¥'+total.toFixed(2);
+    document.getElementById('u-balance').textContent=valStr;
+    // 颜色：<20 红，<100 橙，>=100 绿
+    var tile=document.getElementById('tile-balance');
+    tile.className='stat-tile '+(total<20?'bad':total<100?'warn':'ok');
+    document.getElementById('u-balance-sub').textContent=(b.available?'账户正常':'⚠️ 不可用')+' · '+new Date(b.queried_at).toLocaleTimeString('zh-CN');
+    // 余额详情
+    document.getElementById('balance-detail').innerHTML=
+      '<div style="display:flex;flex-direction:column;gap:10px;">'+
+      '<div style="display:flex;justify-content:space-between;align-items:center;">'+
+        '<span style="font-size:13px;color:var(--sub);">总余额</span>'+
+        '<span style="font-size:22px;font-weight:800;">¥'+total.toFixed(2)+'</span></div>'+
+      '<div style="display:flex;justify-content:space-between;font-size:13px;color:var(--sub);">'+
+        '<span>充值余额</span><span>¥'+(b.topped_up_balance||0).toFixed(2)+'</span></div>'+
+      '<div style="display:flex;justify-content:space-between;font-size:13px;color:var(--sub);">'+
+        '<span>赠送余额</span><span>¥'+(b.granted_balance||0).toFixed(2)+'</span></div>'+
+      '<div style="display:flex;justify-content:space-between;font-size:12px;">'+
+        '<span style="color:var(--sub);">账户状态</span>'+
+        '<span class="key-badge '+(b.available?'ok':'off')+'">'+(b.available?'✅ 正常':'❌ 不可用')+'</span></div>'+
+      '<div style="font-size:11px;color:var(--sub);">更新时间：'+new Date(b.queried_at).toLocaleString('zh-CN')+'</div>'+
+      '</div>';
+  }catch(e){
+    document.getElementById('u-balance').textContent='—';
+    document.getElementById('u-balance-sub').textContent='查询失败';
+    document.getElementById('balance-detail').innerHTML='<div style="color:var(--bad);font-size:13px;">'+e.message+'</div>';
+  }
+  // 密钥状态
+  try{
+    var s=await api(API+'/api-stats');
+    document.getElementById('key-status').innerHTML=
+      '<div class="key-row"><span class="key-label">DeepSeek</span>'+
+        '<span class="key-val">'+esc(s.deepseek_key_preview||'未配置')+'</span>'+
+        '<span class="key-badge '+(s.deepseek_configured?'ok':'off')+'">'+(s.deepseek_configured?'✅':'❌')+'</span></div>'+
+      '<div class="key-row"><span class="key-label">Anthropic</span>'+
+        '<span class="key-val">'+esc(s.anthropic_key_preview||'未配置')+'</span>'+
+        '<span class="key-badge '+(s.anthropic_configured?'ok':'off')+'">'+(s.anthropic_configured?'✅':'❌')+'</span></div>';
+  }catch(e){}
+}
+
+async function loadApiLogs(){
+  try{
+    var d=await api(API+'/api-logs?limit=100');
+    var rows=d.records||[];
+    if(!rows.length){
+      document.getElementById('log-wrap').innerHTML='<div style="color:var(--sub);font-size:13px;padding:12px 0;">暂无记录（向 Agent 发送消息后自动记录）</div>';
+      return;
+    }
+    var html='<table class="log-table"><thead><tr>'+
+      '<th>时间</th><th>Agent</th><th>模型</th><th style="text-align:right;">输入</th><th style="text-align:right;">输出</th><th style="text-align:right;">费用 (¥)</th><th>耗时</th>'+
+      '</tr></thead><tbody>';
+    rows.forEach(function(r){
+      var isClaude=r.model.includes('claude');
+      var dt=new Date(r.ts);
+      var ts=dt.toLocaleString('zh-CN',{month:'numeric',day:'numeric',hour:'2-digit',minute:'2-digit',second:'2-digit'});
+      var modelShort=r.model.length>20?r.model.split('-').slice(-2).join('-'):r.model;
+      html+='<tr>'+
+        '<td style="color:var(--sub);white-space:nowrap;font-size:11px;">'+ts+'</td>'+
+        '<td><span class="agent-dot '+(r.agent||'unknown')+'"></span>'+(r.agent||'—')+'</td>'+
+        '<td><span class="model-badge '+(isClaude?'claude':'deepseek')+'">'+esc(modelShort)+'</span></td>'+
+        '<td style="text-align:right;">'+(r.input_tok||0).toLocaleString()+'</td>'+
+        '<td style="text-align:right;">'+(r.output_tok||0).toLocaleString()+'</td>'+
+        // 单条费用：保留 4 位（量太小，2位会显示 0.00）
+        '<td style="text-align:right;font-weight:600;">'+((r.cost_cny||0).toFixed(4))+'</td>'+
+        '<td style="color:var(--sub);">'+(r.duration_ms||0)+'ms</td>'+
+        '</tr>';
+    });
+    html+='</tbody></table>';
+    document.getElementById('log-wrap').innerHTML=html;
+  }catch(e){
+    document.getElementById('log-wrap').innerHTML='<div style="color:var(--bad);font-size:13px;">加载失败：'+e.message+'</div>';
+  }
+}
+
+/* ── API 配置 ── */
+function openCfg(){
+  document.getElementById('cfg-ds').value='';
+  document.getElementById('cfg-ds-url').value='https://api.deepseek.com';
+  document.getElementById('cfg-ant').value='';
+  document.getElementById('cfg-ant-mdl').value='claude-sonnet-4-6';
+  document.getElementById('overlay').classList.add('show');
+}
+function closeCfg(){document.getElementById('overlay').classList.remove('show');}
+async function saveCfg(){
+  var ds=document.getElementById('cfg-ds').value.trim();
+  var dsUrl=document.getElementById('cfg-ds-url').value.trim();
+  var ant=document.getElementById('cfg-ant').value.trim();
+  var antMdl=document.getElementById('cfg-ant-mdl').value.trim();
+  var body={deepseek_base_url:dsUrl,anthropic_model:antMdl};
+  if(ds)body.deepseek_key=ds;
+  if(ant)body.anthropic_key=ant;
+  try{
+    await api(API+'/api-config',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify(body)});
+    closeCfg();toast('已保存 ✅');
+  }catch(e){toast('保存失败：'+e.message,'err');}
+}
+
+/* ── 跨 Bot 共享数据 ── */
+async function loadResults(){
+  var bot=document.getElementById('results-bot-filter').value;
+  var url=API+'/results?limit=30';
+  if(bot)url+='&bot='+bot;
+  try{
+    var d=await api(url);
+    renderResults(d.results);
+  }catch(e){
+    document.getElementById('results-list').innerHTML='<div style="color:var(--bad);">加载失败：'+esc(e.message)+'</div>';
+  }
+}
+function renderResults(results){
+  var el=document.getElementById('results-list');
+  if(!results||!results.length){el.innerHTML='<div style="color:var(--sub);">暂无处理结果</div>';return;}
+  el.innerHTML=results.map(function(r){
+    var botTag='<span class="tag '+r.bot+'">'+r.bot+'</span>';
+    var time=r.timestamp?r.timestamp.slice(11,19):'';
+    var preview=(r.input_preview||r.input||'').slice(0,60);
+    var statusIcon=r.status==='done'?'✅':r.status==='error'?'❌':'⏱️';
+    return '<div class="task-item" style="cursor:pointer;" onclick="viewResult(\''+r.id+'\')">'+
+      '<div class="task-body">'+
+        '<div class="tn">'+esc(preview)+'</div>'+
+        '<div class="tm">'+botTag+' <span>'+time+'</span> <span>'+statusIcon+'</span></div>'+
+      '</div>'+
+    '</div>';
+  }).join('');
+
+  // 加载统计
+  loadResultStats();
+}
+async function loadResultStats(){
+  try{
+    var d=await api(API+'/results/stats');
+    var se=document.getElementById('results-stats');
+    var byBot=d.by_bot||{};
+    var html='';
+    var bots=[{id:'nora',icon:'📋',label:'Nora'},{id:'sage',icon:'💻',label:'Sage'},{id:'elle',icon:'⚖️',label:'Elle'}];
+    bots.forEach(function(b){
+      var cnt=byBot[b.id]||0;
+      html+='<div class="stat-tile"><div class="st-label">'+b.icon+' '+b.label+'</div><div class="st-val">'+cnt+'</div><div class="st-sub">已处理任务</div></div>';
+    });
+    html+='<div class="stat-tile"><div class="st-label">📦 总处理</div><div class="st-val">'+(d.total||0)+'</div><div class="st-sub">全部任务</div></div>';
+    se.innerHTML=html;
+  }catch(e){}
+}
+async function viewResult(id){
+  try{
+    var d=await api(API+'/results/'+id);
+    var out=d.output||'';
+    if(out.length>500)out=out.slice(0,500)+'\\n...（展开查看完整结果）';
+    alert('['+d.bot+'] '+new Date(d.timestamp).toLocaleString()+'\\n\\n输入：'+(d.input||'').slice(0,120)+'\\n\\n输出：'+out);
+  }catch(e){toast('加载失败','err');}
+}
+async function loadContext(){
+  try{
+    var d=await api(API+'/context?limit=30');
+    var el=document.getElementById('context-list');
+    var h=d.history||[];
+    if(!h.length){el.innerHTML='<div style="color:var(--sub);">暂无共享上下文</div>';return;}
+    el.innerHTML=h.map(function(e){
+      var botTag='<span class="tag '+e.bot+'">'+e.bot+'</span>';
+      var time=e.timestamp?e.timestamp.slice(11,19):'';
+      return '<div class="task-item"><div class="task-body"><div class="tn">'+esc(e.message||'').slice(0,80)+'</div><div class="tm">'+botTag+' <span>'+time+'</span></div></div></div>';
+    }).join('');
+
+    // Bot 上下文统计
+    var ctx=d.bot_contexts||{};
+    var bots=Object.keys(ctx);
+    if(bots.length){
+      var info='<div style="margin-top:12px;padding-top:12px;border-top:1px solid var(--border);">';
+      bots.forEach(function(b){
+        var c=ctx[b];
+        info+='<div style="display:flex;justify-content:space-between;padding:4px 0;font-size:12px;"><span class="tag '+b+'">'+b+'</span><span>'+c.message_count+' 条消息</span><span style="color:var(--sub);">'+(c.last_active||'').slice(11,19)+'</span></div>';
+      });
+      info+='</div>';
+      el.innerHTML+=info;
+    }
+  }catch(e){
+    document.getElementById('context-list').innerHTML='<div style="color:var(--bad);">加载失败：'+esc(e.message)+'</div>';
+  }
+}
+
+/* ── 初始化 ── */
+showPage('overview');
+Promise.all([loadTasks(),loadProjects(),loadModels()]);
+</script>
+</body>
+</html>

@@ -1,0 +1,10 @@
+{
+  "task_id": "354dad86c1d843fc8a2fef286537a8b3",
+  "bot_name": "nora",
+  "text": "cloudflare和porkbun",
+  "chat_id": "oc_5992d422b8a94c1b25784fe0e4a127e3",
+  "open_id": "ou_e6273c75d63b362c95294c715097008b",
+  "started_at": "2026-05-18T12:59:34.605600+00:00",
+  "result": "Chloe，这两个都是靠谱的注册商，我来直接对比：\n\n| 项目 | **Cloudflare Registrar** | **Porkbun** |\n|------|-------------------------|-------------|\n| .ai 域名价格 | 成本价，~$90/年 | 可能首年稍低，续费 ~$90/年 |\n| 支付方式 | 信用卡、PayPal **不支持支付宝** | **支持支付宝** |\n| 隐私保护 | 免费 | 免费 |\n| 后续部署 | 无缝对接 Cloudflare Pages | 可自行配置 |\n| 适用场景 | 技术操作多一点 | 操作简单，对国内支付友好 |\n\n**对你而言，我更推荐 Porkbun**，因为支持支付宝，购买流程更傻瓜。  \n你现在就告诉我，我们是去 Porkbun 买 **suetech.ai**（一年 90 美金），还是查一下 **suetech.com**（一年十几美金）能不能注册？",
+  "error": null
+}

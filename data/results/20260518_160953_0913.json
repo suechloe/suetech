@@ -1,0 +1,17 @@
+{
+  "id": "20260518_160953_0913",
+  "source": "feishu_nora",
+  "bot": "nora",
+  "input": "SueTech.ai和Sutech.ai哪个域名更好",
+  "input_preview": "SueTech.ai和Sutech.ai哪个域名更好",
+  "output": "Chloe，直接说结论：\n\n**SueTech.ai 更好。用这个做主域名。**\n\n理由很简单，三点：\n\n1. **可读性**  \n   “SueTech” 一眼能看出是“Sue”+“Tech”，品牌名直接呈现。  \n   “Sutech” 连成一片，容易读成“Sute-ch”或“苏太克”，增加解释成本。\n\n2. **品牌资产**  \n   你对外叫 Sue Tech，不是 Sutech。域名跟品牌名完全对应，用户少一道心智转换。Sutech.ai 更像是为了简短而牺牲了辨识度。\n\n3. **行业惯例**  \n   .ai 域名本身就是给 AI/Tech 公司用的，SueTech.ai 的四个音节简洁有力，不比 Sutech.ai 长多少，但清晰度提升很大。\n\n---\n\n### 实操方案\n- **SueTech.ai** → 设为主域名，官网、邮箱、对外物料全部用这个。\n- **Sutech.ai** → 保留，设 301 跳转到 SueTech.ai，防止被别人注册后混淆。\n\n你现在手上有 sutech.ai 指向空白页对吧？我们先把 SueTech.ai 解析到位，然后让 Sage 上那个极简 landing page，域名和品牌就彻底对齐了。要现在动手吗？",
+  "output_preview": "Chloe，直接说结论：\n\n**SueTech.ai 更好。用这个做主域名。**\n\n理由很简单，三点：\n\n1. **可读性**  \n   “SueTech” 一眼能看出是“Sue”+“Tech”，品牌名直接呈现。  \n   “Sutech” 连成一片，容易读成“Sute-ch”或“苏太克”，增加解释成本。\n\n2. **品牌资产**  \n   你对外叫 Sue Tech，不是 Sutech。域名跟品",
+  "timestamp": "2026-05-18T16:09:53.091345+08:00",
+  "elapsed_seconds": 34.11,
+  "agents": [
+    "nora",
+    "sage",
+    "elle"
+  ],
+  "status": "done"
+}

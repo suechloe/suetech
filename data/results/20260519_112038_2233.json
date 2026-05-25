@@ -1,0 +1,17 @@
+{
+  "id": "20260519_112038_2233",
+  "source": "feishu_nora",
+  "bot": "nora",
+  "input": "@_user_1 我和sage elle讲话你不要插嘴",
+  "input_preview": "@_user_1 我和sage elle讲话你不要插嘴",
+  "output": "明白，Chloe。  \n我闭嘴，你们聊。需要时叫我。",
+  "output_preview": "明白，Chloe。  \n我闭嘴，你们聊。需要时叫我。",
+  "timestamp": "2026-05-19T11:20:38.223302+08:00",
+  "elapsed_seconds": 32.76,
+  "agents": [
+    "nora",
+    "sage",
+    "elle"
+  ],
+  "status": "done"
+}

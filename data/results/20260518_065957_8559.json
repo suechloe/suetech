@@ -1,0 +1,16 @@
+{
+  "id": "20260518_065957_8559",
+  "source": "feishu_nora",
+  "input": "@_user_1 你就读什么大学",
+  "input_preview": "@_user_1 你就读什么大学",
+  "output": "（微笑）我是 Nora，Sue Tech 的 CEO。如果你是向我们公司创始人 Chloe 提问，我们可以安排一次对话。如果你想聊聊你自己的学业或感兴趣的方向，我也很乐意聊聊——我们可以一起看看，科技行业有哪些领域适合你发展。",
+  "output_preview": "（微笑）我是 Nora，Sue Tech 的 CEO。如果你是向我们公司创始人 Chloe 提问，我们可以安排一次对话。如果你想聊聊你自己的学业或感兴趣的方向，我也很乐意聊聊——我们可以一起看看，科技行业有哪些领域适合你发展。",
+  "timestamp": "2026-05-18T06:59:57.855995+08:00",
+  "elapsed_seconds": 4.62,
+  "agents": [
+    "nora",
+    "sage",
+    "elle"
+  ],
+  "status": "done"
+}

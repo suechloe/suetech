@@ -1,0 +1,17 @@
+{
+  "id": "20260519_025951_7616",
+  "source": "dashboard_nora",
+  "bot": "nora",
+  "input": "你好",
+  "input_preview": "你好",
+  "output": "Chloe 你好呀～😊  \n\n聊了这么多，**sutech.ai 的事还差最后一步没搞定**：你那边查一下 whois 信息（截图或复制给我），我就能马上推进。  \n\n要不咱们换个话题？你想聊什么随时说～",
+  "output_preview": "Chloe 你好呀～😊  \n\n聊了这么多，**sutech.ai 的事还差最后一步没搞定**：你那边查一下 whois 信息（截图或复制给我），我就能马上推进。  \n\n要不咱们换个话题？你想聊什么随时说～",
+  "timestamp": "2026-05-19T02:59:51.761631+08:00",
+  "elapsed_seconds": 18.22,
+  "agents": [
+    "nora",
+    "sage",
+    "elle"
+  ],
+  "status": "done"
+}

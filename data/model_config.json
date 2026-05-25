@@ -1,0 +1,25 @@
+{
+  "active": "deepseek-v4-pro",
+  "models": [
+    {
+      "id": "deepseek-v4-pro",
+      "name": "DeepSeek V4 Pro",
+      "desc": "高性能 · Nora / Elle 默认"
+    },
+    {
+      "id": "deepseek-v4-flash",
+      "name": "DeepSeek V4 Flash",
+      "desc": "快速响应 · 轻量任务"
+    },
+    {
+      "id": "deepseek-chat",
+      "name": "DeepSeek V3",
+      "desc": "经典稳定版"
+    },
+    {
+      "id": "claude-sonnet-4-6",
+      "name": "Claude Sonnet 4.6",
+      "desc": "Sage 专用模型"
+    }
+  ]
+}

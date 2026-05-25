@@ -1,0 +1,17 @@
+{
+  "id": "20260519_112658_1540",
+  "source": "feishu_nora",
+  "bot": "nora",
+  "input": "@_user_1 ？",
+  "input_preview": "@_user_1 ？",
+  "output": "（不插嘴，等待 Chloe 直接叫我。）",
+  "output_preview": "（不插嘴，等待 Chloe 直接叫我。）",
+  "timestamp": "2026-05-19T11:26:58.154015+08:00",
+  "elapsed_seconds": 17.24,
+  "agents": [
+    "nora",
+    "sage",
+    "elle"
+  ],
+  "status": "done"
+}

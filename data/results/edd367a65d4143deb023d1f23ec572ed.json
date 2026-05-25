@@ -1,0 +1,10 @@
+{
+  "task_id": "edd367a65d4143deb023d1f23ec572ed",
+  "bot_name": "nora",
+  "text": "那suetech.ai我看租一年才十几刀啊",
+  "chat_id": "oc_5992d422b8a94c1b25784fe0e4a127e3",
+  "open_id": "ou_e6273c75d63b362c95294c715097008b",
+  "started_at": "2026-05-18T12:47:13.320722+00:00",
+  "result": "Chloe，你确定看的是 **.ai** 后缀？还是查成了别的？\n\n**.ai 域名的市场价就是 $90–$100/年，从来没有 $10 多的。**  \n十几刀只有一种可能：你看的是 .com / .net / .org 这类常规后缀，不是 .ai。\n\n### 你现在帮我确认一下：\n1. 打开 [Namecheap 搜索页](https://www.namecheap.com/domains/registration/results/?domain=suetech.ai)\n2. 截图，我要看到完整搜索结果页（包括后缀、价格、注册按钮）\n3. 特别是“Available”旁边写的数字，是用 **$/yr** 还是 **first year** 这种写法\n\n---\n\n如果是 **first year $12.98**，后面会有小字：“Renews at $89.98/yr”——首年优惠罢了，第二年立刻涨回原价。这种便宜占不占没意义，因为域名是长期持有。\n\n如果你的预算对 $90/年敏感，我们还有 .com 或者其他后缀可选。但前提是先让我看到你屏幕上实际显示的，免得我们根据错误信息瞎决策。",
+  "error": null
+}

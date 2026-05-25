@@ -1,0 +1,17 @@
+{
+  "id": "20260518_193655_9564",
+  "source": "dashboard_nora",
+  "bot": "nora",
+  "input": "授权",
+  "input_preview": "授权",
+  "output": "Chloe，收到授权。我让 Sage 现在直接去查 `sutech.ai` 的注册状态，10 秒内出结果——\n\nSage，帮忙跑一下 whois `sutech.ai`，把注册人、注册商、到期日、状态（是否已注册）用大白话告诉我。\n\nChloe 你稍等，马上好。",
+  "output_preview": "Chloe，收到授权。我让 Sage 现在直接去查 `sutech.ai` 的注册状态，10 秒内出结果——\n\nSage，帮忙跑一下 whois `sutech.ai`，把注册人、注册商、到期日、状态（是否已注册）用大白话告诉我。\n\nChloe 你稍等，马上好。",
+  "timestamp": "2026-05-18T19:36:55.956431+08:00",
+  "elapsed_seconds": 0.0,
+  "agents": [
+    "nora",
+    "sage",
+    "elle"
+  ],
+  "status": "done"
+}

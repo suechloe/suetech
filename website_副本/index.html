@@ -1,0 +1,276 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Sue Tech · 岁科技 — AI 智能团队</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com" />
+  <link href="https://fonts.googleapis.com/css2?family=Inter:opsz@14..32&family=Noto+Sans+SC:wght@400;500;600;700;800&display=swap" rel="stylesheet" />
+  <style>
+    :root {
+      --bg: #faf9f6;
+      --fg: #1a1a2e;
+      --muted: #6b7280;
+      --accent: #6366f1;
+      --accent-light: #e0e7ff;
+      --card-bg: #ffffff;
+      --border: #e5e7eb;
+    }
+    * { margin: 0; padding: 0; box-sizing: border-box; }
+    html { scroll-behavior: smooth; }
+    body {
+      font-family: 'Noto Sans SC', 'Inter', -apple-system, sans-serif;
+      background: var(--bg);
+      color: var(--fg);
+      line-height: 1.7;
+    }
+
+    /* ── Nav ── */
+    nav {
+      position: fixed; top: 0; left: 0; right: 0;
+      z-index: 100; background: rgba(250,249,246,.85); backdrop-filter: blur(16px);
+      border-bottom: 1px solid var(--border);
+      padding: 0 32px; height: 64px;
+      display: flex; align-items: center; justify-content: space-between;
+    }
+    nav .logo { font-weight: 800; font-size: 1.25rem; letter-spacing: -.02em; }
+    nav .logo span { color: var(--accent); }
+    nav .links { display: flex; gap: 28px; align-items: center; }
+    nav .links a {
+      text-decoration: none; color: var(--muted); font-size: .9rem; font-weight: 500;
+      transition: color .2s;
+    }
+    nav .links a:hover { color: var(--fg); }
+    nav .btn-dash {
+      background: var(--fg); color: #fff; border: none; padding: 8px 20px;
+      border-radius: 8px; font-size: .85rem; font-weight: 600; cursor: pointer;
+      text-decoration: none; transition: background .2s;
+    }
+    nav .btn-dash:hover { background: var(--accent); }
+
+    /* ── Hero ── */
+    .hero {
+      min-height: 100vh; display: flex; flex-direction: column;
+      justify-content: center; align-items: center; text-align: center;
+      padding: 100px 24px 80px;
+    }
+    .hero h1 {
+      font-size: clamp(2.5rem, 6vw, 4.5rem); font-weight: 800;
+      letter-spacing: -.03em; line-height: 1.15;
+    }
+    .hero h1 .highlight {
+      background: linear-gradient(135deg, var(--accent), #a855f7);
+      -webkit-background-clip: text; -webkit-text-fill-color: transparent;
+    }
+    .hero p {
+      max-width: 600px; margin-top: 24px; font-size: 1.15rem; color: var(--muted);
+    }
+    .hero .actions { margin-top: 40px; display: flex; gap: 16px; flex-wrap: wrap; justify-content: center; }
+    .hero .actions a {
+      padding: 14px 36px; border-radius: 12px; font-weight: 600; font-size: 1rem;
+      text-decoration: none; transition: all .2s;
+    }
+    .hero .actions .primary { background: var(--fg); color: #fff; }
+    .hero .actions .primary:hover { background: var(--accent); transform: translateY(-2px); }
+    .hero .actions .secondary { border: 1.5px solid var(--border); color: var(--fg); }
+    .hero .actions .secondary:hover { border-color: var(--fg); transform: translateY(-2px); }
+
+    /* ── Sections ── */
+    section { padding: 80px 24px; max-width: 1200px; margin: 0 auto; }
+    .section-label {
+      font-size: .8rem; font-weight: 600; letter-spacing: .08em;
+      text-transform: uppercase; color: var(--accent); margin-bottom: 12px;
+    }
+    .section-title {
+      font-size: clamp(1.8rem, 3vw, 2.5rem); font-weight: 700;
+      letter-spacing: -.02em; margin-bottom: 16px;
+    }
+    .section-desc { color: var(--muted); max-width: 600px; margin-bottom: 48px; }
+
+    /* ── Agents ── */
+    .agents-grid {
+      display: grid; grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+      gap: 24px;
+    }
+    .agent-card {
+      background: var(--card-bg); border: 1px solid var(--border);
+      border-radius: 16px; padding: 40px 32px; transition: all .25s;
+    }
+    .agent-card:hover { transform: translateY(-4px); box-shadow: 0 12px 40px rgba(0,0,0,.06); }
+    .agent-card .icon { font-size: 2.5rem; margin-bottom: 16px; }
+    .agent-card h3 { font-size: 1.25rem; margin-bottom: 4px; }
+    .agent-card .role { font-size: .85rem; color: var(--accent); font-weight: 500; margin-bottom: 12px; }
+    .agent-card p { color: var(--muted); font-size: .95rem; }
+
+    /* ── Features ── */
+    .features-grid {
+      display: grid; grid-template-columns: repeat(auto-fit, minmax(240px, 1fr));
+      gap: 24px;
+    }
+    .feature-item {
+      padding: 24px; border: 1px solid var(--border); border-radius: 12px;
+      background: var(--card-bg);
+    }
+    .feature-item .f-icon { font-size: 1.5rem; margin-bottom: 8px; }
+    .feature-item h4 { font-size: 1rem; margin-bottom: 6px; }
+    .feature-item p { color: var(--muted); font-size: .9rem; }
+
+    /* ── Dashboard preview ── */
+    .dash-preview {
+      background: var(--card-bg); border: 1px solid var(--border);
+      border-radius: 20px; overflow: hidden; text-align: center;
+    }
+    .dash-preview .dash-header {
+      padding: 40px 32px 32px;
+    }
+    .dash-preview .dash-header h3 { font-size: 1.5rem; font-weight: 700; margin-bottom: 8px; }
+    .dash-preview .dash-header p { color: var(--muted); font-size: .95rem; margin-bottom: 24px; }
+    .dash-preview .dash-header a {
+      display: inline-block; background: var(--fg); color: #fff; padding: 12px 32px;
+      border-radius: 10px; font-weight: 600; text-decoration: none; transition: background .2s;
+    }
+    .dash-preview .dash-header a:hover { background: var(--accent); }
+    .dash-preview .dash-mock {
+      background: #f3f2ef; padding: 24px; overflow-x: auto;
+    }
+    .dash-preview .dash-mock img {
+      max-width: 100%; border-radius: 12px; border: 1px solid var(--border);
+      box-shadow: 0 4px 24px rgba(0,0,0,.06);
+    }
+
+    /* ── Footer ── */
+    footer {
+      border-top: 1px solid var(--border); padding: 40px 24px;
+      text-align: center; color: var(--muted); font-size: .85rem;
+    }
+    footer p span { color: var(--accent); }
+
+    /* ── Responsive ── */
+    @media (max-width: 640px) {
+      nav { padding: 0 16px; }
+      nav .links { display: none; }
+      section { padding: 48px 16px; }
+      .agents-grid { grid-template-columns: 1fr; }
+    }
+  </style>
+</head>
+<body>
+
+<!-- ═══ Nav ═══ -->
+<nav>
+  <div class="logo">Sue <span>Tech</span></div>
+  <div class="links">
+    <a href="#agents">Agent</a>
+    <a href="#features">特点</a>
+    <a href="#dashboard">控制台</a>
+    <a class="btn-dash" href="http://localhost:8080" target="_blank">打开控制台 →</a>
+  </div>
+</nav>
+
+<!-- ═══ Hero ═══ -->
+<section class="hero" id="hero">
+  <h1>
+    你的第一个<br>
+    <span class="highlight">AI 智能团队</span>
+  </h1>
+  <p>
+    Sue Tech 为你带来三位 AI Agent：Nora 统筹全局，Sage 搞定代码，Elle 处理法律。<br>
+    一个团队，三种能力，随时待命。
+  </p>
+  <div class="actions">
+    <a class="primary" href="#agents">了解 Agent</a>
+    <a class="secondary" href="http://localhost:8080" target="_blank">打开控制台</a>
+  </div>
+</section>
+
+<!-- ═══ Agents ═══ -->
+<section id="agents">
+  <div class="section-label">AI Agent</div>
+  <h2 class="section-title">三位专家，一个团队</h2>
+  <p class="section-desc">每个 Agent 都有独立人格和专业领域，协作解决你的问题。</p>
+  <div class="agents-grid">
+    <div class="agent-card">
+      <div class="icon">📋</div>
+      <h3>Nora</h3>
+      <div class="role">CEO · 首席协调官</div>
+      <p>理解你的意图，协调 Sage 和 Elle 分工协作。把复杂的事拆解成清晰的任务，给你大白话的最终答案。</p>
+    </div>
+    <div class="agent-card">
+      <div class="icon">💻</div>
+      <h3>Sage</h3>
+      <div class="role">首席工程师</div>
+      <p>Claude 在 Sue Tech 的技术分身。写代码、搭系统、修 bug、自动化，所有技术问题交给他。</p>
+    </div>
+    <div class="agent-card">
+      <div class="icon">⚖️</div>
+      <h3>Elle</h3>
+      <div class="role">法律顾问</div>
+      <p>审查合同、提供法律建议、起草文书、评估风险。给你清晰的法律参考意见。</p>
+    </div>
+  </div>
+</section>
+
+<!-- ═══ Features ═══ -->
+<section id="features">
+  <div class="section-label">为什么选择 Sue Tech</div>
+  <h2 class="section-title">AI 团队，而非单个助手</h2>
+  <p class="section-desc">多专家协作的 AI 系统，比单个 AI 更专业、更可靠。</p>
+  <div class="features-grid">
+    <div class="feature-item">
+      <div class="f-icon">🤝</div>
+      <h4>多专家协作</h4>
+      <p>Nora 分析意图后委派给最合适的专家（Sage/Elle），比你逐个找工具更高效。</p>
+    </div>
+    <div class="feature-item">
+      <div class="f-icon">🧠</div>
+      <h4>深度技术能力</h4>
+      <p>Sage 由 Claude 驱动，拥有和 AI 前沿模型同等的代码生成与系统设计能力。</p>
+    </div>
+    <div class="feature-item">
+      <div class="f-icon">🔒</div>
+      <h4>法律护航</h4>
+      <p>Elle 提供中国法律体系下的合同审查、维权建议和风险评估参考。</p>
+    </div>
+    <div class="feature-item">
+      <div class="f-icon">💬</div>
+      <h4>飞书内直接对话</h4>
+      <p>在飞书上像聊天一样召唤三位 Agent，无需切换平台。</p>
+    </div>
+    <div class="feature-item">
+      <div class="f-icon">📊</div>
+      <h4>可视化控制台</h4>
+      <p>网页 Dashboard 实时查看 Agent 状态、对话记录、API 用量。</p>
+    </div>
+    <div class="feature-item">
+      <div class="f-icon">🚀</div>
+      <h4>一人公司标配</h4>
+      <p>专为创始人打造——你不需要团队，Sue Tech 就是你的团队。</p>
+    </div>
+  </div>
+</section>
+
+<!-- ═══ Dashboard ═══ -->
+<section id="dashboard">
+  <div class="section-label">控制台</div>
+  <h2 class="section-title">对话 & 管理后台</h2>
+  <p class="section-desc">在网页端与三位 Agent 对话，查看对话历史、API 用量和系统状态。</p>
+  <div class="dash-preview">
+    <div class="dash-header">
+      <h3>Sue Tech Dashboard</h3>
+      <p>实时控制台 · Agent 对话 · 用量监控</p>
+      <a href="http://localhost:8080" target="_blank">进入控制台 →</a>
+    </div>
+    <div class="dash-mock">
+      <img src="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='800' height='400' viewBox='0 0 800 400'%3E%3Crect width='800' height='400' fill='%23f3f2ef'/%3E%3Ctext x='400' y='200' text-anchor='middle' font-family='sans-serif' font-size='18' fill='%236b7280'%3EScreenshot placeholder%3C/text%3E%3C/svg%3E"
+           alt="Dashboard 截图" />
+    </div>
+  </div>
+</section>
+
+<!-- ═══ Footer ═══ -->
+<footer>
+  <p>© 2026 <span>Sue Tech</span> · 岁科技 · Built with Claude</p>
+</footer>
+
+</body>
+</html>

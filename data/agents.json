@@ -1,0 +1,5 @@
+[
+  {"id": "nora", "name": "Nora", "role": "CEO / 总管", "status": "online", "avatar": "📋", "color": "nora"},
+  {"id": "sage", "name": "Sage", "role": "首席工程师", "status": "online", "avatar": "💻", "color": "sage"},
+  {"id": "elle", "name": "Elle", "role": "法律顾问", "status": "online", "avatar": "⚖️", "color": "elle"}
+]

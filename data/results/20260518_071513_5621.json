@@ -1,0 +1,16 @@
+{
+  "id": "20260518_071513_5621",
+  "source": "feishu_nora",
+  "input": "1235，",
+  "input_preview": "1235，",
+  "output": "好的，收到。我是 Nora，Sue Tech 的 CEO。请问 Chloe，有什么指示？",
+  "output_preview": "好的，收到。我是 Nora，Sue Tech 的 CEO。请问 Chloe，有什么指示？",
+  "timestamp": "2026-05-18T07:15:13.562169+08:00",
+  "elapsed_seconds": 4.4,
+  "agents": [
+    "nora",
+    "sage",
+    "elle"
+  ],
+  "status": "done"
+}

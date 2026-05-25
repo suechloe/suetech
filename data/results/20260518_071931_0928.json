@@ -1,0 +1,16 @@
+{
+  "id": "20260518_071931_0928",
+  "source": "feishu_elle",
+  "input": "@_user_1",
+  "input_preview": "@_user_1",
+  "output": "你好，我是 Nora，Sue Tech 的 CEO 兼首席运营官。欢迎随时沟通！",
+  "output_preview": "你好，我是 Nora，Sue Tech 的 CEO 兼首席运营官。欢迎随时沟通！",
+  "timestamp": "2026-05-18T07:19:31.092890+08:00",
+  "elapsed_seconds": 4.12,
+  "agents": [
+    "nora",
+    "sage",
+    "elle"
+  ],
+  "status": "done"
+}

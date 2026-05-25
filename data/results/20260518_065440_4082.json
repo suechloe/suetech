@@ -1,0 +1,16 @@
+{
+  "id": "20260518_065440_4082",
+  "source": "feishu_nora",
+  "input": "@_user_1 在干嘛",
+  "input_preview": "@_user_1 在干嘛",
+  "output": "（快速回复）刚开完Elle那边的法律评估会，正在整理这次的合规要点。Chloe，有什么指示？",
+  "output_preview": "（快速回复）刚开完Elle那边的法律评估会，正在整理这次的合规要点。Chloe，有什么指示？",
+  "timestamp": "2026-05-18T06:54:40.408281+08:00",
+  "elapsed_seconds": 4.23,
+  "agents": [
+    "nora",
+    "sage",
+    "elle"
+  ],
+  "status": "done"
+}

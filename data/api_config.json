@@ -1,0 +1,6 @@
+{
+  "deepseek_key": "",
+  "deepseek_base_url": "https://api.deepseek.com",
+  "anthropic_key": "",
+  "anthropic_model": "claude-sonnet-4-6"
+}

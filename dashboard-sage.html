@@ -1,0 +1,433 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Sue Tech · 控制台</title>
+<style>
+:root {
+  --bg: #f0f2f5;
+  --sidebar-bg: #1a1d2e;
+  --sidebar-w: 240px;
+  --topbar-h: 56px;
+  --card: #fff;
+  --primary: #5b6ef5;
+  --primary-light: #eef0ff;
+  --ok: #10b981;
+  --warn: #f59e0b;
+  --bad: #ef4444;
+  --text: #111827;
+  --sub: #6b7280;
+  --border: #e5e7eb;
+  --radius: 12px;
+  --shadow: 0 1px 4px rgba(0,0,0,.07);
+}
+*{margin:0;padding:0;box-sizing:border-box;}
+body{font-family:-apple-system,BlinkMacSystemFont,"Segoe UI",Roboto,sans-serif;background:var(--bg);color:var(--text);height:100vh;display:flex;flex-direction:column;overflow:hidden;}
+
+.topbar{
+  height:var(--topbar-h);flex-shrink:0;
+  background:var(--card);border-bottom:1px solid var(--border);
+  display:flex;align-items:center;justify-content:space-between;
+  padding:0 24px;z-index:10;
+}
+.topbar-left{display:flex;align-items:center;gap:10px;}
+.topbar-left .diamond{color:var(--primary);font-size:18px;}
+.topbar-left h1{font-size:17px;font-weight:700;letter-spacing:-.3px;}
+.topbar-right{display:flex;align-items:center;gap:16px;font-size:13px;color:var(--sub);}
+.status-pill{display:flex;align-items:center;gap:6px;background:#f0fdf4;border:1px solid #bbf7d0;border-radius:20px;padding:4px 12px;color:#15803d;font-size:12px;font-weight:500;}
+.status-pill .dot{width:7px;height:7px;border-radius:50%;background:#22c55e;}
+
+.shell{display:flex;flex:1;overflow:hidden;}
+
+.sidebar{
+  width:var(--sidebar-w);flex-shrink:0;
+  background:var(--sidebar-bg);
+  display:flex;flex-direction:column;
+  overflow-y:auto;overflow-x:hidden;
+  padding:16px 0 12px;
+}
+.section{padding:0 14px;margin-bottom:6px;}
+.section-label{font-size:10px;font-weight:600;color:rgba(255,255,255,.3);text-transform:uppercase;letter-spacing:.8px;padding:0 8px;margin-bottom:4px;}
+
+.s-item{
+  display:flex;align-items:center;gap:10px;
+  padding:9px 8px;border-radius:8px;
+  cursor:pointer;color:rgba(255,255,255,.6);
+  font-size:13.5px;font-weight:500;
+  transition:background .15s,color .15s;
+}
+.s-item:hover{background:rgba(255,255,255,.07);color:#fff;}
+.s-item.active{background:var(--primary);color:#fff;}
+.s-item .s-icon{width:22px;text-align:center;font-size:15px;flex-shrink:0;}
+.s-item .s-name{flex:1;}
+.s-item .s-tag{font-size:10px;font-weight:600;padding:2px 6px;border-radius:4px;background:rgba(255,255,255,.12);color:rgba(255,255,255,.7);}
+.s-item.active .s-tag{background:rgba(255,255,255,.25);color:#fff;}
+.s-item .s-badge{width:7px;height:7px;border-radius:50%;background:var(--ok);flex-shrink:0;}
+
+.s-divider{height:1px;background:rgba(255,255,255,.06);margin:8px 14px;}
+
+.main{flex:1;overflow-y:auto;padding:24px;display:flex;flex-direction:column;gap:20px;}
+
+.page-hd{display:flex;align-items:center;justify-content:space-between;}
+.page-hd h2{font-size:18px;font-weight:700;}
+.page-hd .sub{font-size:13px;color:var(--sub);}
+
+.grid-2{display:grid;grid-template-columns:1fr 1fr;gap:16px;}
+.grid-3{display:grid;grid-template-columns:repeat(3,1fr);gap:16px;}
+
+.card{background:var(--card);border-radius:var(--radius);border:1px solid var(--border);box-shadow:var(--shadow);padding:20px;}
+.card-hd{display:flex;align-items:center;justify-content:space-between;margin-bottom:16px;}
+.card-hd .title{font-size:13px;font-weight:600;color:var(--sub);text-transform:uppercase;letter-spacing:.4px;}
+
+.agent-card{background:var(--card);border:1px solid var(--border);border-radius:var(--radius);padding:16px 20px;display:flex;align-items:center;gap:14px;box-shadow:var(--shadow);cursor:pointer;transition:.15s;}
+.agent-card:hover{border-color:var(--primary);box-shadow:0 0 0 2px var(--primary-light);}
+.agent-av{width:44px;height:44px;border-radius:11px;display:flex;align-items:center;justify-content:center;font-size:20px;flex-shrink:0;}
+.agent-av.nora{background:#eef1ff;}
+.agent-av.sage{background:#e6fdf3;}
+.agent-av.elle{background:#fff7e6;}
+.agent-info{flex:1;}
+.agent-name{font-size:14px;font-weight:700;}
+.agent-role{font-size:12px;color:var(--sub);margin-top:2px;}
+.agent-online{display:flex;align-items:center;gap:5px;font-size:11px;color:var(--ok);font-weight:500;}
+.agent-online .dot{width:6px;height:6px;border-radius:50%;background:var(--ok);}
+
+.chat-view{display:flex;flex-direction:column;gap:0;height:calc(100vh - var(--topbar-h) - 48px);}
+.chat-hd{background:var(--card);border:1px solid var(--border);border-radius:var(--radius) var(--radius) 0 0;padding:16px 20px;display:flex;align-items:center;gap:12px;border-bottom:none;}
+.chat-hd .c-av{width:38px;height:38px;border-radius:9px;display:flex;align-items:center;justify-content:center;font-size:18px;}
+.chat-hd .c-av.nora{background:#eef1ff;}
+.chat-hd .c-av.sage{background:#e6fdf3;}
+.chat-hd .c-av.elle{background:#fff7e6;}
+.chat-hd .c-name{font-size:15px;font-weight:700;}
+.chat-hd .c-role{font-size:12px;color:var(--sub);}
+.chat-hd .c-status{margin-left:auto;display:flex;align-items:center;gap:5px;font-size:12px;color:var(--ok);}
+.chat-msgs{flex:1;overflow-y:auto;background:var(--card);border-left:1px solid var(--border);border-right:1px solid var(--border);padding:16px 20px;display:flex;flex-direction:column;gap:10px;}
+.msg{max-width:72%;padding:10px 14px;border-radius:10px;font-size:13.5px;line-height:1.55;}
+.msg.user{background:var(--primary);color:#fff;border-radius:10px 10px 2px 10px;align-self:flex-end;}
+.msg.agent{background:#f3f4f6;color:var(--text);border-radius:10px 10px 10px 2px;align-self:flex-start;}
+.msg-typing{align-self:flex-start;background:#f3f4f6;border-radius:10px 10px 10px 2px;padding:12px 16px;display:flex;gap:4px;}
+.msg-typing span{width:7px;height:7px;border-radius:50%;background:#9ca3af;animation:blink 1.2s infinite both;}
+.msg-typing span:nth-child(2){animation-delay:.2s;}
+.msg-typing span:nth-child(3){animation-delay:.4s;}
+@keyframes blink{0%,80%,100%{opacity:.2;}40%{opacity:1;}}
+.chat-inp-wrap{background:var(--card);border:1px solid var(--border);border-radius:0 0 var(--radius) var(--radius);padding:12px 16px;display:flex;gap:8px;border-top:1px solid var(--border);}
+.chat-inp{flex:1;border:1px solid var(--border);border-radius:8px;padding:9px 14px;font-size:13.5px;outline:none;font-family:inherit;color:var(--text);transition:.15s;}
+.chat-inp:focus{border-color:var(--primary);box-shadow:0 0 0 2px var(--primary-light);}
+.btn-send{background:var(--primary);color:#fff;border:none;border-radius:8px;padding:9px 20px;font-size:13.5px;font-weight:600;cursor:pointer;transition:.15s;}
+.btn-send:hover{background:#4a5de0;}
+.btn-send:disabled{opacity:.5;cursor:default;}
+
+.task-item{display:flex;align-items:flex-start;gap:10px;padding:10px 0;border-bottom:1px solid var(--border);}
+.task-item:last-child{border-bottom:none;}
+.task-chk{width:18px;height:18px;border-radius:50%;border:2px solid var(--border);flex-shrink:0;margin-top:1px;cursor:pointer;display:flex;align-items:center;justify-content:center;transition:.15s;}
+.task-chk:hover{border-color:var(--ok);}
+.task-chk.done{background:var(--ok);border-color:var(--ok);}
+.task-chk.done::after{content:"✓";color:#fff;font-size:10px;font-weight:700;}
+.task-body .tn{font-size:13px;font-weight:500;}
+.task-body .tn.done{text-decoration:line-through;color:var(--sub);}
+.task-body .tm{font-size:11px;color:var(--sub);margin-top:2px;display:flex;gap:6px;}
+.tag{display:inline-block;padding:1px 6px;border-radius:4px;font-size:10px;font-weight:600;}
+.tag.nora{background:#eef1ff;color:var(--primary);}
+.tag.sage{background:#e6fdf3;color:#059669;}
+.tag.elle{background:#fff7e6;color:#d97706;}
+.task-add-row{display:flex;gap:8px;margin-top:12px;padding-top:12px;border-top:1px solid var(--border);}
+.task-add-row input{flex:1;border:1px solid var(--border);border-radius:7px;padding:7px 11px;font-size:13px;outline:none;font-family:inherit;}
+.task-add-row input:focus{border-color:var(--primary);}
+.task-add-row select{border:1px solid var(--border);border-radius:7px;padding:7px 10px;font-size:13px;outline:none;background:var(--card);color:var(--text);}
+.btn-sm{background:var(--primary);color:#fff;border:none;border-radius:7px;padding:7px 14px;font-size:13px;font-weight:600;cursor:pointer;}
+
+.proj-item{margin-bottom:14px;}
+.proj-item:last-child{margin-bottom:0;}
+.proj-hd{display:flex;justify-content:space-between;font-size:13px;margin-bottom:5px;}
+.proj-hd .l{font-weight:500;}
+.proj-hd .p{color:var(--sub);}
+.proj-bar{height:6px;background:var(--border);border-radius:3px;overflow:hidden;}
+.proj-fill{height:100%;border-radius:3px;transition:width .6s ease;}
+.proj-fill.blue{background:var(--primary);}
+.proj-fill.green{background:var(--ok);}
+.proj-fill.yellow{background:var(--warn);}
+.proj-fill.purple{background:#8b5cf6;}
+
+.toast{position:fixed;top:16px;right:16px;padding:11px 18px;border-radius:8px;color:#fff;font-size:13px;z-index:999;opacity:0;transform:translateY(-8px);transition:.25s;pointer-events:none;}
+.toast.show{opacity:1;transform:translateY(0);}
+.toast.ok{background:var(--ok);}
+.toast.err{background:var(--bad);}
+
+.overlay{position:fixed;inset:0;background:rgba(0,0,0,.45);z-index:100;display:none;align-items:center;justify-content:center;}
+.overlay.show{display:flex;}
+.modal{background:#fff;border-radius:16px;padding:28px;width:440px;max-width:90vw;box-shadow:0 20px 60px rgba(0,0,0,.18);}
+.modal h2{font-size:17px;font-weight:700;margin-bottom:20px;}
+.m-row{margin-bottom:14px;}
+.m-row label{display:block;font-size:12px;font-weight:600;color:var(--sub);margin-bottom:5px;}
+.m-row input{width:100%;border:1px solid var(--border);border-radius:8px;padding:9px 12px;font-size:13px;outline:none;font-family:inherit;}
+.m-row input:focus{border-color:var(--primary);}
+.m-acts{display:flex;justify-content:flex-end;gap:8px;margin-top:20px;}
+.btn-ghost{background:transparent;border:1px solid var(--border);border-radius:8px;padding:8px 18px;font-size:13px;cursor:pointer;}
+.btn-pri{background:var(--primary);color:#fff;border:none;border-radius:8px;padding:8px 18px;font-size:13px;font-weight:600;cursor:pointer;}
+</style>
+</head>
+<body>
+
+<div class="topbar">
+  <div class="topbar-left">
+    <span class="diamond">◆</span>
+    <h1>Sue Tech</h1>
+  </div>
+  <div class="topbar-right">
+    <div class="status-pill"><span class="dot"></span> 全员在线</div>
+    <span id="live-clock"></span>
+  </div>
+</div>
+
+<div class="shell">
+<div class="sidebar">
+  <div class="section">
+    <div class="section-label">导航</div>
+    <div class="s-item active" id="nav-overview" onclick="showPage('overview')">
+      <span class="s-icon">🏠</span>
+      <span class="s-name">总览</span>
+    </div>
+  </div>
+  <div class="s-divider"></div>
+  <div class="section">
+    <div class="section-label">Agent 团队</div>
+    <div class="s-item" id="nav-nora" onclick="showPage('chat','nora')">
+      <span class="s-icon">📋</span><span class="s-name">Nora</span>
+      <span class="s-tag">CEO</span><span class="s-badge"></span>
+    </div>
+    <div class="s-item" id="nav-sage" onclick="showPage('chat','sage')">
+      <span class="s-icon">💻</span><span class="s-name">Sage</span>
+      <span class="s-tag">工程师</span><span class="s-badge"></span>
+    </div>
+    <div class="s-item" id="nav-elle" onclick="showPage('chat','elle')">
+      <span class="s-icon">⚖️</span><span class="s-name">Elle</span>
+      <span class="s-tag">法律</span><span class="s-badge"></span>
+    </div>
+  </div>
+  <div class="s-divider"></div>
+  <div class="section">
+    <div class="section-label">AI 模型</div>
+    <div id="model-list"></div>
+  </div>
+  <div class="s-divider"></div>
+  <div class="section">
+    <div class="section-label">API 用量</div>
+    <div id="usage-stats">
+      <div class="s-stat-row"><span>调用次数</span><span class="sv" id="u-calls">—</span></div>
+      <div class="s-stat-row"><span>Token</span><span class="sv" id="u-tokens">—</span></div>
+      <div class="s-stat-row"><span>预估费用</span><span class="sv" id="u-cost">—</span></div>
+    </div>
+  </div>
+  <div class="s-divider"></div>
+  <div class="s-section">
+    <div class="s-item" onclick="openCfg()">
+      <span class="s-icon">⚙️</span><span class="s-name">API 配置</span>
+    </div>
+  </div>
+</div>
+
+<div class="main" id="main">
+
+  <div id="page-overview">
+    <div class="page-hd" style="margin-bottom:20px;">
+      <div><h2>公司总览</h2><div class="sub">Sue Tech · 一人公司 AI 运营系统</div></div>
+    </div>
+
+    <div class="grid-3" style="margin-bottom:16px;">
+      <div class="agent-card" onclick="showPage('chat','nora')">
+        <div class="agent-av nora">📋</div>
+        <div class="agent-info"><div class="agent-name">Nora</div><div class="agent-role">CEO · 总管协调</div></div>
+        <div class="agent-online"><span class="dot"></span> 在线</div>
+      </div>
+      <div class="agent-card" onclick="showPage('chat','sage')">
+        <div class="agent-av sage">💻</div>
+        <div class="agent-info"><div class="agent-name">Sage</div><div class="agent-role">首席工程师</div></div>
+        <div class="agent-online"><span class="dot"></span> 在线</div>
+      </div>
+      <div class="agent-card" onclick="showPage('chat','elle')">
+        <div class="agent-av elle">⚖️</div>
+        <div class="agent-info"><div class="agent-name">Elle</div><div class="agent-role">法律顾问</div></div>
+        <div class="agent-online"><span class="dot"></span> 在线</div>
+      </div>
+    </div>
+
+    <div class="grid-2">
+      <div class="card">
+        <div class="card-hd"><span class="title">✅ 待办任务</span></div>
+        <div id="ov-tasks"></div>
+        <div class="task-add-row">
+          <input id="ov-new-task" placeholder="添加任务...">
+          <select id="ov-new-agent"><option value="nora">Nora</option><option value="sage">Sage</option><option value="elle">Elle</option></select>
+          <button class="btn-sm" onclick="addTask()">+</button>
+        </div>
+      </div>
+      <div class="card">
+        <div class="card-hd"><span class="title">📈 项目进展</span></div>
+        <div id="ov-projects"></div>
+      </div>
+    </div>
+  </div>
+
+  <div id="page-chat" style="display:none;">
+    <div class="chat-view">
+      <div class="chat-hd">
+        <div class="c-av nora" id="chat-av">📋</div>
+        <div><div class="c-name" id="chat-name">Nora</div><div class="c-role" id="chat-role">CEO · 总管协调</div></div>
+        <div class="c-status" style="margin-left:auto;display:flex;align-items:center;gap:12px;">
+          <!-- 多 Agent 模式开关 -->
+          <label style="display:flex;align-items:center;gap:6px;cursor:pointer;font-size:12px;color:var(--sub);" title="开启后消息由 Nora→Sage/Elle 多 Agent 协作处理">
+            <span id="crew-label">单 Agent</span>
+            <div onclick="toggleCrew()" id="crew-toggle" style="width:36px;height:20px;border-radius:10px;background:#d1d5db;position:relative;cursor:pointer;transition:.2s;flex-shrink:0;">
+              <div id="crew-knob" style="width:16px;height:16px;border-radius:50%;background:#fff;position:absolute;top:2px;left:2px;transition:.2s;box-shadow:0 1px 3px rgba(0,0,0,.2);"></div>
+            </div>
+          </label>
+          <span style="display:flex;align-items:center;gap:5px;font-size:12px;color:var(--ok);"><span style="width:7px;height:7px;border-radius:50%;background:var(--ok);display:inline-block;"></span> 在线</span>
+        </div>
+      </div>
+      <div class="chat-msgs" id="chat-msgs"></div>
+      <div class="chat-inp-wrap">
+        <input type="text" class="chat-inp" id="chat-inp" placeholder="输入消息..." onkeydown="if(event.key==='Enter')sendMsg()">
+        <button class="btn-send" id="btn-send" onclick="sendMsg()">发送</button>
+      </div>
+    </div>
+  </div>
+
+</div>
+</div>
+
+<div class="overlay" id="overlay" onclick="if(event.target===this)closeCfg()">
+  <div class="modal">
+    <h2>⚙️ API 配置</h2>
+    <div class="m-row"><label>DeepSeek API Key</label><input type="password" id="cfg-ds" placeholder="sk-..."></div>
+    <div class="m-row"><label>DeepSeek Base URL</label><input type="text" id="cfg-ds-url" value="https://api.deepseek.com"></div>
+    <div class="m-row"><label>Anthropic API Key</label><input type="text" id="cfg-ant" placeholder="sk-ant-..."></div>
+    <div class="m-row"><label>Anthropic Model</label><input type="text" id="cfg-ant-mdl" value="claude-sonnet-4-6"></div>
+    <div class="m-acts">
+      <button class="btn-ghost" onclick="closeCfg()">取消</button>
+      <button class="btn-pri" onclick="saveCfg()">保存</button>
+    </div>
+  </div>
+</div>
+<div class="toast" id="toast"></div>
+
+<script>
+var API='/api'; var curAgent='nora'; var allTasks=[]; var modelsData=null; var crewMode=false;
+var agentMeta={
+  nora:{name:'Nora',role:'CEO · 总管协调',av:'📋',cls:'nora',greeting:'你好，我是 Nora，Sue Tech 的 CEO 总管。有什么需要我处理？'},
+  sage:{name:'Sage',role:'首席工程师',av:'💻',cls:'sage',greeting:'你好，我是 Sage，负责所有技术工作。有什么代码或技术问题？'},
+  elle:{name:'Elle',role:'法律顾问',av:'⚖️',cls:'elle',greeting:'你好，我是 Elle，专注法律事务。有合同或法律问题可以来问我。'},
+};
+
+function tick(){document.getElementById('live-clock').textContent=new Date().toLocaleString('zh-CN',{year:'numeric',month:'long',day:'numeric',weekday:'short',hour:'2-digit',minute:'2-digit',second:'2-digit'});}
+tick();setInterval(tick,1000);
+
+function toast(m,c){var e=document.getElementById('toast');e.textContent=m;e.className='toast '+c+' show';setTimeout(function(){e.classList.remove('show')},2500);}
+
+async function api(u,o){var r=await fetch(u,o||{});if(!r.ok)throw new Error(((await r.json().catch(function(){return{};})).detail)||r.statusText);return r.json();}
+
+function showPage(p,a){
+  document.getElementById('page-overview').style.display=p==='overview'?'':'none';
+  document.getElementById('page-chat').style.display=p==='chat'?'':'none';
+  document.querySelectorAll('.s-item').forEach(function(e){e.classList.remove('active');});
+  if(p==='overview'){document.getElementById('nav-overview').classList.add('active');}
+  else if(p==='chat'){
+    document.getElementById('nav-'+a).classList.add('active');
+    curAgent=a; var m=agentMeta[a];
+    var av=document.getElementById('chat-av'); av.textContent=m.av; av.className='c-av '+m.cls;
+    document.getElementById('chat-name').textContent=m.name;
+    document.getElementById('chat-role').textContent=m.role;
+    document.getElementById('chat-inp').placeholder='向 '+m.name+' 发送消息...';
+    loadChat(); document.getElementById('chat-inp').focus();
+  }
+}
+
+function ck(a){return'st_chat_'+(a||curAgent);}
+function loadChat(){
+  var el=document.getElementById('chat-msgs'); var m=agentMeta[curAgent];
+  try{var h=JSON.parse(localStorage.getItem(ck())||'[]');
+    el.innerHTML=h.length?h.map(function(x){return'<div class="msg '+x.r+'">'+x.t.replace(/\n/g,'<br>')+'</div>';}).join(''):'<div class="msg agent">'+m.greeting+'</div>';
+  }catch(e){el.innerHTML='<div class="msg agent">'+m.greeting+'</div>';}
+  el.scrollTop=el.scrollHeight;
+}
+function saveChat(){
+  var ms=document.getElementById('chat-msgs').querySelectorAll('.msg');
+  localStorage.setItem(ck(),JSON.stringify(Array.from(ms).map(function(e){return{r:e.classList.contains('user')?'user':'agent',t:e.innerHTML.replace(/<br>/g,'\n')};})));
+}
+function addMsg(r,t){var el=document.getElementById('chat-msgs');var d=document.createElement('div');d.className='msg '+r;d.innerHTML=t.replace(/\n/g,'<br>');el.appendChild(d);el.scrollTop=el.scrollHeight;saveChat();}
+function sT(){var el=document.getElementById('chat-msgs');var d=document.createElement('div');d.className='msg-typing';d.id='tp';d.innerHTML='<span></span><span></span><span></span>';el.appendChild(d);el.scrollTop=el.scrollHeight;}
+function hT(){var e=document.getElementById('tp');if(e)e.remove();}
+
+function toggleCrew(){
+  crewMode=!crewMode;
+  var t=document.getElementById('crew-toggle'),k=document.getElementById('crew-knob'),l=document.getElementById('crew-label');
+  t.style.background=crewMode?'var(--primary)':'#d1d5db';
+  k.style.left=crewMode?'18px':'2px';
+  l.textContent=crewMode?'多 Agent':'单 Agent';
+  toast(crewMode?'🤖 多 Agent 模式：Nora→Sage/Elle 协作':'💬 单 Agent 模式',crewMode?'ok':'');
+}
+
+async function sendMsg(){
+  var inp=document.getElementById('chat-inp'),btn=document.getElementById('btn-send'),txt=inp.value.trim();if(!txt)return;
+  inp.value='';inp.disabled=btn.disabled=true;addMsg('user',txt);sT();
+  try{
+    var url=crewMode?API+'/crew/chat':API+'/chat/'+curAgent;
+    var r=await api(url,{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({message:txt})});
+    hT();
+    var prefix=crewMode?'<span style="font-size:11px;color:var(--sub);display:block;margin-bottom:4px;">🤖 Nora · 多Agent协作</span>':'';
+    addMsg('agent',prefix+r.response);
+  }
+  catch(e){hT();addMsg('agent','抱歉：'+e.message);toast('发送失败','err');}
+  inp.disabled=btn.disabled=false;inp.focus();
+}
+
+async function loadTasks(){
+  try{allTasks=await api(API+'/tasks');renderTasks();}
+  catch(e){document.getElementById('ov-tasks').innerHTML='<div style="color:var(--sub);font-size:13px;">暂无任务</div>';}
+}
+function renderTasks(){
+  var p=allTasks.filter(function(t){return t.status!=='done';}).slice(0,6);
+  var el=document.getElementById('ov-tasks');
+  el.innerHTML=p.length?p.map(function(t){return'<div class="task-item"><div class="task-chk" onclick="doneTask('+t.id+')"></div><div class="task-body"><div class="tn">'+t.title+'</div><div class="tm"><span class="tag '+t.agent+'">'+(t.agent==='nora'?'Nora':t.agent==='sage'?'Sage':'Elle')+'</span>'+t.date+'</div></div></div>';}).join(''):'<div style="color:var(--sub);font-size:13px;padding:6px 0;">暂无待办 ✨</div>';
+}
+async function doneTask(id){try{await api(API+'/tasks/'+id,{method:'PATCH',headers:{'Content-Type':'application/json'},body:JSON.stringify({status:'done'})});loadTasks();toast('已完成','ok');}catch(e){}}
+async function addTask(){
+  var inp=document.getElementById('ov-new-task'),title=inp.value.trim();if(!title)return;
+  var ag=document.getElementById('ov-new-agent').value;
+  if(allTasks.filter(function(t){return t.status!=='done'&&t.agent===ag;}).length>=3){toast(ag+' 待办已满 3 项','err');return;}
+  try{await api(API+'/tasks',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({title:title,agent:ag})});inp.value='';loadTasks();toast('已添加','ok');}catch(e){}
+}
+
+var dp=[{name:'飞书 Agent 部署',progress:100,color:'green'},{name:'Multi-Agent 开发',progress:70,color:'blue'},{name:'API 监控告警',progress:45,color:'yellow'},{name:'官网建设',progress:15,color:'purple'}];
+async function loadProjects(){
+  try{var p=await api(API+'/projects');if(!p||!p.length)p=dp;
+    document.getElementById('ov-projects').innerHTML=p.map(function(x){return'<div class="proj-item"><div class="proj-hd"><span class="l">'+x.name+'</span><span class="p">'+x.progress+'%</span></div><div class="proj-bar"><div class="proj-fill '+x.color+'" style="width:'+x.progress+'%"></div></div></div>';}).join('');}
+  catch(e){document.getElementById('ov-projects').innerHTML=dp.map(function(x){return'<div class="proj-item"><div class="proj-hd"><span class="l">'+x.name+'</span><span class="p">'+x.progress+'%</span></div><div class="proj-bar"><div class="proj-fill '+x.color+'" style="width:'+x.progress+'%"></div></div></div>';}).join('');}
+}
+
+async function loadModels(){
+  try{modelsData=await api(API+'/models');
+    document.getElementById('model-list').innerHTML=modelsData.models.map(function(m){
+      var s=m.id===modelsData.active,off=!m.configured;
+      return'<div class="s-model '+(s?'sel':'')+'" style="'+(off?'opacity:0.35;':'')+'" '+(off?'':'onclick="swModel(\''+m.id+'\')"')+'>'+
+        '<span class="s-icon">🤖</span><span class="m-name">'+(off?'🔒 ':'')+m.name+' <span style="font-size:10px;color:rgba(255,255,255,.3);">'+(m.provider||'')+'</span></span></div>';
+    }).join('');}catch(e){}
+}
+async function swModel(id){if(!modelsData||id===modelsData.active)return;try{modelsData=await api(API+'/models/switch',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({active:id})});loadModels();toast('已切换','ok');}catch(e){}}
+
+async function loadUsage(){
+  try{var s=await api(API+'/api-usage');
+    document.getElementById('u-calls').textContent=(s.total_calls||0).toLocaleString();
+    document.getElementById('u-tokens').textContent=(s.total_tokens||0).toLocaleString();
+    document.getElementById('u-cost').textContent='$'+(s.estimated_cost||0).toFixed(2);}catch(e){}
+}
+
+function openCfg(){document.getElementById('overlay').classList.add('show');}
+function closeCfg(){document.getElementById('overlay').classList.remove('show');}
+async function saveCfg(){try{await api(API+'/api-config',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({deepseek_key:document.getElementById('cfg-ds').value,deepseek_base_url:document.getElementById('cfg-ds-url').value,anthropic_key:document.getElementById('cfg-ant').value,anthropic_model:document.getElementById('cfg-ant-mdl').value})});closeCfg();loadUsage();toast('已保存','ok');}catch(e){}}
+
+showPage('overview');
+Promise.all([loadTasks(),loadProjects(),loadModels(),loadUsage()]);
+setInterval(loadUsage,60000);
+</script>
+</body>
+</html>

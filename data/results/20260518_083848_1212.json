@@ -1,0 +1,17 @@
+{
+  "id": "20260518_083848_1212",
+  "source": "dashboard_sage",
+  "bot": "sage",
+  "input": "测试一下网页和飞书数据互通",
+  "input_preview": "测试一下网页和飞书数据互通",
+  "output": "好的，我来帮你测试网页和飞书的数据互通。这是一个常见的企业级需求。我们先从一个最简单的场景开始：网页提交数据，通过飞书机器人/Webhook 发送到飞书群。\n\n### 第一步：获取飞书 Webhook 地址\n\n1. 打开飞书客户端或网页版。\n2. 进入你想接收消息的群聊。\n3. 点击群设置 → 群机器人 → 添加机器人 → 选择「自定义机器人」。\n4. 设置机器人名称和头像，点击完成。\n5. **复制 Webhook 地址**，它长这样：\n   ```\n   https://open.feishu.cn/open-apis/bot/v2/hook/xxxxxxxx-xxxx-xxxx-xxxx-xxxxxxxxxxxx\n   ```\n\n### 第二步：写一个简单的 HTML 页面（测试提交）\n\n创建一个文件 `test_feishu.html`，内容如下：\n\n```html\n<!DOCTYPE html>\n<html>\n<body>\n<h2>飞书消息测试</h2>\n<input id=\"msgInput\" placeholder=\"输入要发送的消息\" />\n<button onclick=\"sendToFeishu()\">发送到飞书</button>\n\n<script>\nasync function sendToFeishu() {\n  const msg = document.getElementById('msgInput').value;\n  if (!msg) { alert('请输入消息'); return; }\n\n  // 替换成你的飞书 Webhook 地址\n  const webhookUrl = '你的飞书Webhook地址';\n\n  const payload = {\n    msg_type: 'text',\n    content: {\n      text: `来自网页的消息：${msg}`\n    }\n  };\n\n  try {\n    const resp = await fetch(webhookUrl, {\n      method: 'POST',\n      headers: { 'Content-Type': 'application/json' },\n      body: JSON.stringify(payload)\n    });\n    const result = await resp.json();\n    if (result.code === 0) {\n      alert('✅ 发送成功！');\n    } else {\n      alert('❌ 发送失败：' + result.msg);\n    }\n  } catch (e) {\n    alert('网络错误：' + e.message);\n  }\n}\n</script>\n</body>\n</html>\n```\n\n### 第三步：运行测试\n\n1. **用浏览器打开这个 HTML 文件**（双击即可）。\n2. 输入任意内容，点击「发送到飞书」。\n3. 看看飞书群里有没有收到消息。\n\n---\n\n### 如果网页要接收飞书的数据（反向：飞书 → 网页）\n\n这是稍复杂的方向。需要：\n- 一个公开可访问的 URL（比如用 ngrok 或部署到服务器）\n- 飞书可以通过事件订阅或 Webhook 把数据推送到你的网页\n\n这里给你一个最简单的接收端测试代码（Python）：\n\n```python\nfrom flask import Flask, request, jsonify\n\napp = Flask(__name__)\n\n@app.route('/feishu_webhook', methods=['POST'])\ndef handle_feishu():\n    data = request.json\n    print(\"收到飞书数据：\", data)\n    # 这里可以做你的业务处理\n    return jsonify({\"code\": 0, \"msg\": \"成功\"})\n\nif __name__ == '__main__':\n    app.run(host='0.0.0.0', port=5000)\n```\n\n**运行方式**：\n1. 保存为 `server.py`\n2. 终端运行：`pip install flask && python server.py`\n3. 用 ngrok 暴露：`ngrok http 5000`\n4. 把 ngrok 生成的 https 地址（例如 `https://xxxx.ngrok.io/feishu_webhook`）配置到飞书自定义机器人或事件订阅中。\n\n---\n\n### 你要测试哪个方向？\n\n| 方向 | 场景 |\n|------|------|\n| **网页 → 飞书** | 用户填表单、报修、申请，自动通知飞书群 |\n| **飞书 → 网页** | 飞书审批结果、消息、指令同步到你的后台系统 |\n\n告诉我你需要哪一个，我帮你写完整的、可直接运行的代码。",
+  "output_preview": "好的，我来帮你测试网页和飞书的数据互通。这是一个常见的企业级需求。我们先从一个最简单的场景开始：网页提交数据，通过飞书机器人/Webhook 发送到飞书群。\n\n### 第一步：获取飞书 Webhook 地址\n\n1. 打开飞书客户端或网页版。\n2. 进入你想接收消息的群聊。\n3. 点击群设置 → 群机器人 → 添加机器人 → 选择「自定义机器人」。\n4. 设置机器人名称和头像，点击完成。\n5. **",
+  "timestamp": "2026-05-18T08:38:48.121253+08:00",
+  "elapsed_seconds": 0.0,
+  "agents": [
+    "nora",
+    "sage",
+    "elle"
+  ],
+  "status": "done"
+}
