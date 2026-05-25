@@ -31,10 +31,19 @@ def on_message(data: P2ImMessageReceiveV1):
     try:
         text = json.loads(data.event.message.content).get("text", "").strip()
         message_id = data.event.message.message_id
+        chat_id = data.event.message.chat_id  # 获取对话 ID
     except Exception:
         return
     print(f"[Nora] {text[:80]}...")
     if not text:
+        return
+
+    # 只在被 @nora 时才响应
+    # 检查是否被 @mention（飞书中 @mention 会包含 <at...>nora</at> 或 @nora 文本）
+    is_mentioned = "@nora" in text.lower() or ("<at" in text and "nora" in text.lower())
+
+    if not is_mentioned:
+        print(f"[Nora] 消息未 @nora，忽略")
         return
 
     reply(message_id, "⏳ 处理中...")
