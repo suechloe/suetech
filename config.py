@@ -14,7 +14,7 @@ FEISHU_SAGE_APP_SECRET = os.getenv("FEISHU_SAGE_APP_SECRET", "")
 
 DEEPSEEK_API_KEY  = os.getenv("DEEPSEEK_API_KEY", "")
 DEEPSEEK_BASE_URL = "https://api.deepseek.com"
-DEEPSEEK_MODEL    = "deepseek-chat"
+DEEPSEEK_MODEL    = "deepseek-v4-pro"
 
 ANTHROPIC_API_KEY = os.getenv("ANTHROPIC_API_KEY", "")
 ANTHROPIC_MODEL   = "claude-sonnet-4-6"
