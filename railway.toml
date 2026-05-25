@@ -1,6 +1,9 @@
-[build]
-builder = "dockerfile"
+[env]
+builder = "nixpacks"
+
+[deploy]
+startCommand = "python bot_sage.py"
 
 [[services]]
 name = "sage"
-startCommand = "python bot_sage.py"
+build.dockerfile = "Dockerfile"
