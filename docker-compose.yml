@@ -1,0 +1,8 @@
+version: '3.8'
+services:
+  sage:
+    build: .
+    command: python bot_sage.py
+    environment:
+      - FEISHU_SAGE_APP_ID=${FEISHU_SAGE_APP_ID}
+      - FEISHU_SAGE_APP_SECRET=${FEISHU_SAGE_APP_SECRET}
