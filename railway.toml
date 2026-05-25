@@ -1,0 +1,6 @@
+[build]
+builder = "dockerfile"
+
+[[services]]
+name = "sage"
+startCommand = "python bot_sage.py"
