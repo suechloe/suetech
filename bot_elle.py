@@ -33,9 +33,17 @@ def reply(message_id, text):
     except Exception as e:
         logger.error(f"[Reply Error] {e}")
 
+def clean_text(text: str) -> str:
+    """清理飞书消息中的 @mention 占位符，保留实际内容"""
+    import re
+    # 飞书 @mention 格式：@_user_1, @_user_2 等，直接删除
+    text = re.sub(r'@_user_\d+', '', text)
+    return text.strip()
+
 def on_message(data: P2ImMessageReceiveV1):
     try:
-        text = json.loads(data.event.message.content).get("text", "").strip()
+        raw = json.loads(data.event.message.content).get("text", "").strip()
+        text = clean_text(raw)
         message_id = data.event.message.message_id
     except Exception:
         return
