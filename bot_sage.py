@@ -1,22 +1,28 @@
 """
 Sage 飞书机器人
 收到消息 → 直接调用 Sage Agent → 自动回复
-（不走 Nora 编排，保持与网页版 Sage 行为一致）
+自动重连、心跳保活
 """
-import json, asyncio, threading, time
+import json, asyncio, threading, time, logging
 import lark_oapi as lark
 from lark_oapi.api.im.v1 import *
 from config import FEISHU_SAGE_APP_ID, FEISHU_SAGE_APP_SECRET
+from tools.feishu_connection import FeishuConnectionManager
 from agents.sage import sage as sage_fn
 from task_handler import save_conversation
 
 LABEL = "💻 Sage [代码]"
+
+logger = logging.getLogger("bot_sage")
 
 def run_async(coro):
     loop = asyncio.new_event_loop()
     threading.Thread(target=lambda: loop.run_until_complete(coro), daemon=True).start()
 
 client = lark.Client.builder().app_id(FEISHU_SAGE_APP_ID).app_secret(FEISHU_SAGE_APP_SECRET).build()
+
+# 全局连接管理器引用
+connection_manager: FeishuConnectionManager = None
 
 def reply(message_id, text):
     try:
@@ -25,7 +31,7 @@ def reply(message_id, text):
         ).build()
         client.im.v1.message.reply(req)
     except Exception as e:
-        print(f"[Reply Error] {e}")
+        logger.error(f"[Reply Error] {e}")
 
 def on_message(data: P2ImMessageReceiveV1):
     try:
@@ -33,6 +39,11 @@ def on_message(data: P2ImMessageReceiveV1):
         message_id = data.event.message.message_id
     except Exception:
         return
+
+    # 更新心跳
+    if connection_manager:
+        connection_manager.update_heartbeat()
+
     print(f"[Sage] {text[:80]}...")
     if not text:
         return
@@ -52,6 +63,13 @@ def on_message(data: P2ImMessageReceiveV1):
     run_async(run())
 
 if __name__ == "__main__":
-    print(f"{LABEL} 启动 → 直接调用 Sage Agent")
-    handler = lark.EventDispatcherHandler.builder("", "").register_p2_im_message_receive_v1(on_message).build()
-    lark.ws.Client(FEISHU_SAGE_APP_ID, FEISHU_SAGE_APP_SECRET, event_handler=handler, log_level=lark.LogLevel.INFO).start()
+    print(f"{LABEL} 启动 → 直接调用 Sage Agent (自动重连)")
+
+    connection_manager = FeishuConnectionManager(
+        app_id=FEISHU_SAGE_APP_ID,
+        app_secret=FEISHU_SAGE_APP_SECRET,
+        on_message_handler=on_message,
+        bot_name="Sage"
+    )
+
+    connection_manager.start()
