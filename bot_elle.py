@@ -1,9 +1,9 @@
 """
 Elle 飞书机器人
 收到消息 → 直接调用 Elle Agent → 自动回复
-自动重连、心跳保活
+智能识别：提到 Elle 或法律相关关键词自动响应，无需 @
 """
-import json, asyncio, threading, time, logging
+import json, asyncio, threading, time, logging, re
 import lark_oapi as lark
 from lark_oapi.api.im.v1 import *
 from config import FEISHU_ELLE_APP_ID, FEISHU_ELLE_APP_SECRET
@@ -13,6 +13,9 @@ from task_handler import save_conversation
 
 LABEL = "⚖️ Elle [法律]"
 
+# Elle 响应关键词：提到名字 或 法律相关
+ELLE_KEYWORDS = ["elle", "法律", "合同", "协议", "维权", "起草", "条款", "纠纷", "投诉", "律师", "法规", "权益", "诉讼"]
+
 logger = logging.getLogger("bot_elle")
 
 def run_async(coro):
@@ -21,42 +24,53 @@ def run_async(coro):
 
 client = lark.Client.builder().app_id(FEISHU_ELLE_APP_ID).app_secret(FEISHU_ELLE_APP_SECRET).build()
 
-# 全局连接管理器引用
 connection_manager: FeishuConnectionManager = None
 
-def reply(message_id, text):
+def send_message(chat_id, text):
+    """发送新消息（不引用），避免出现 Chloe: 的前缀"""
     try:
-        req = ReplyMessageRequest.builder().message_id(message_id).request_body(
-            ReplyMessageRequestBody.builder().content(json.dumps({"text": text})).msg_type("text").build()
-        ).build()
-        client.im.v1.message.reply(req)
+        req = CreateMessageRequest.builder() \
+            .receive_id_type("chat_id") \
+            .request_body(
+                CreateMessageRequestBody.builder()
+                    .receive_id(chat_id)
+                    .content(json.dumps({"text": text}))
+                    .msg_type("text")
+                    .build()
+            ).build()
+        client.im.v1.message.create(req)
     except Exception as e:
-        logger.error(f"[Reply Error] {e}")
+        logger.error(f"[Send Error] {e}")
 
 def clean_text(text: str) -> str:
-    """清理飞书消息中的 @mention 占位符，保留实际内容"""
-    import re
-    # 飞书 @mention 格式：@_user_1, @_user_2 等，直接删除
-    text = re.sub(r'@_user_\d+', '', text)
-    return text.strip()
+    """清理飞书 @mention 占位符"""
+    return re.sub(r'@_user_\d+', '', text).strip()
+
+def should_respond(text: str) -> bool:
+    """判断 Elle 是否应该响应这条消息"""
+    text_lower = text.lower()
+    return any(kw in text_lower for kw in ELLE_KEYWORDS)
 
 def on_message(data: P2ImMessageReceiveV1):
     try:
         raw = json.loads(data.event.message.content).get("text", "").strip()
         text = clean_text(raw)
         message_id = data.event.message.message_id
+        chat_id = data.event.message.chat_id
     except Exception:
         return
 
-    # 更新心跳
     if connection_manager:
         connection_manager.update_heartbeat()
 
-    print(f"[Elle] {text[:80]}...")
     if not text:
         return
 
-    reply(message_id, "⏳ 处理中...")
+    if not should_respond(text):
+        return
+
+    print(f"[Elle] 收到消息: {text[:80]}")
+    send_message(chat_id, "⏳ 处理中...")
 
     async def run():
         try:
@@ -64,14 +78,14 @@ def on_message(data: P2ImMessageReceiveV1):
             result = await elle_fn(text)
             elapsed = time.time() - t0
             save_conversation(text, result, source="feishu_elle", elapsed=elapsed)
-            reply(message_id, f"{LABEL}\n\n{result}")
+            send_message(chat_id, f"{LABEL}\n\n{result}")
         except Exception as e:
-            reply(message_id, f"❌ 出错了：{e}")
+            send_message(chat_id, f"❌ 出错了：{e}")
 
     run_async(run())
 
 if __name__ == "__main__":
-    print(f"{LABEL} 启动 → 直接调用 Elle Agent (自动重连)")
+    print(f"{LABEL} 启动（智能识别模式，无需 @）")
 
     connection_manager = FeishuConnectionManager(
         app_id=FEISHU_ELLE_APP_ID,
