@@ -22,7 +22,7 @@ logger = logging.getLogger("bot_manager")
 # Bot 配置
 BOTS = {
     "nora": {"script": "bot_nora.py", "label": "📋 Nora [CEO]"},
-    # "sage": {"script": "bot_sage.py", "label": "💻 Sage [代码]"},  # ⏳ 暂时禁用，需要修复 DeepSeek API key
+    "sage": {"script": "bot_sage.py", "label": "💻 Sage [代码]"},
     "elle": {"script": "bot_elle.py", "label": "⚖️ Elle [法律]"},
 }
 

@@ -9,7 +9,7 @@ fastapi>=0.100.0
 uvicorn[standard]>=0.23.0
 
 # ── LLM API ──
-openai>=1.0.0            # DeepSeek（兼容 OpenAI 接口）
+openai>=1.0.0,<2.0.0     # DeepSeek（兼容 OpenAI 接口，v2 有 breaking change）
 anthropic>=0.25.0         # Claude（可选，Sage 代码增强）
 
 # ── 飞书 SDK ──
