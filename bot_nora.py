@@ -2,13 +2,15 @@
 Nora 飞书机器人
 收到消息 → CrewAI 多 Agent 处理 → 自动回复
 智能识别：提到 Nora 或日程/规划关键词自动响应，无需 @
+支持：主动推送每日晨报给 Chloe（需 CHLOE_OPEN_ID 环境变量）
 """
-import json, asyncio, threading, logging, re
+import json, asyncio, threading, logging, re, time, datetime, os
 import lark_oapi as lark
 from lark_oapi.api.im.v1 import *
 from config import FEISHU_NORA_APP_ID, FEISHU_NORA_APP_SECRET
 from tools.api_monitor import check_and_alert
 from tools.feishu_connection import FeishuConnectionManager
+from tools.push import send_to_chloe
 from task_handler import process_message as crew_process
 
 LABEL = "📋 Nora [CEO]"
@@ -56,8 +58,9 @@ def on_message(data: P2ImMessageReceiveV1):
     try:
         raw = json.loads(data.event.message.content).get("text", "").strip()
         text = clean_text(raw)
-        message_id = data.event.message.message_id
         chat_id = data.event.message.chat_id
+        # 记录发送者 Open ID（用于主动推送功能）
+        sender_open_id = data.event.sender.sender_id.open_id or ""
     except Exception:
         return
 
@@ -65,6 +68,16 @@ def on_message(data: P2ImMessageReceiveV1):
         connection_manager.update_heartbeat()
 
     if not text:
+        return
+
+    # 特殊指令：返回发送者的 Open ID
+    if "我的id" in text.lower() or "我的open id" in text.lower() or "myid" in text.lower():
+        send_message(chat_id,
+            f"📋 Nora [CEO]\n\n"
+            f"Chloe，你的飞书 Open ID 是：\n`{sender_open_id}`\n\n"
+            f"把这个 ID 告诉 Sage，他会帮你配置主动推送功能。"
+        )
+        logger.info(f"[Nora] 用户 Open ID 查询：{sender_open_id}")
         return
 
     if not should_respond(text):
@@ -85,8 +98,49 @@ def on_message(data: P2ImMessageReceiveV1):
 
     run_async(run())
 
+def morning_report_scheduler():
+    """
+    每天早上 9:00（北京时间）给 Chloe 发晨报。
+    以后台线程运行，不阻塞主进程。
+    """
+    REPORT_HOUR_UTC = 1  # UTC 01:00 = 北京 09:00
+    last_sent_date = None
+
+    while True:
+        now_utc = datetime.datetime.utcnow()
+        today = now_utc.date()
+
+        if now_utc.hour == REPORT_HOUR_UTC and last_sent_date != today:
+            last_sent_date = today
+            try:
+                report = (
+                    f"📋 Nora 晨报 — {today.strftime('%Y年%m月%d日')}\n\n"
+                    f"早安 Chloe！\n\n"
+                    f"三位助手今天都在线：\n"
+                    f"  📋 Nora（CEO/协调）— 随时待命\n"
+                    f"  💻 Sage（首席工程师）— 随时待命\n"
+                    f"  ⚖️ Elle（法律顾问）— 随时待命\n\n"
+                    f"有什么需要直接在群里说，我们会自动识别关键词回应。\n"
+                    f"今天也加油！💪"
+                )
+                send_to_chloe(client, report)
+                logger.info(f"[Nora] ✅ 晨报已发送 ({today})")
+            except Exception as e:
+                logger.error(f"[Nora] 晨报发送失败: {e}")
+
+        time.sleep(60)  # 每分钟检查一次
+
+
 if __name__ == "__main__":
     print(f"{LABEL} 启动（智能识别模式，无需 @）")
+
+    # 启动晨报调度器（后台线程）
+    if os.environ.get("CHLOE_OPEN_ID"):
+        report_thread = threading.Thread(target=morning_report_scheduler, daemon=True, name="nora-morning-report")
+        report_thread.start()
+        print(f"[Nora] ✅ 晨报调度器已启动（每天北京时间 09:00 推送）")
+    else:
+        print(f"[Nora] ⚠️  CHLOE_OPEN_ID 未设置，晨报功能待激活。让 Chloe 发 '我的id' 获取。")
 
     connection_manager = FeishuConnectionManager(
         app_id=FEISHU_NORA_APP_ID,

@@ -55,8 +55,8 @@ def on_message(data: P2ImMessageReceiveV1):
     try:
         raw = json.loads(data.event.message.content).get("text", "").strip()
         text = clean_text(raw)
-        message_id = data.event.message.message_id
         chat_id = data.event.message.chat_id
+        sender_open_id = data.event.sender.sender_id.open_id or ""
     except Exception:
         return
 
@@ -64,6 +64,16 @@ def on_message(data: P2ImMessageReceiveV1):
         connection_manager.update_heartbeat()
 
     if not text:
+        return
+
+    # 特殊指令：返回发送者的 Open ID
+    if "我的id" in text.lower() or "我的open id" in text.lower() or "myid" in text.lower():
+        send_message(chat_id,
+            f"💻 Sage [代码]\n\n"
+            f"Chloe，你的飞书 Open ID 是：\n`{sender_open_id}`\n\n"
+            f"把这个告诉我，我帮你配置好主动推送，让 Nora 每天早上给你发汇报。"
+        )
+        logger.info(f"[Sage] 用户 Open ID 查询：{sender_open_id}")
         return
 
     if not should_respond(text):
