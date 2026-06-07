@@ -81,21 +81,19 @@ class FeishuConnectionManager:
     def _monitor_heartbeat(self):
         """监控连接健康状况（后台线程）"""
         while self.is_running:
-            time.sleep(30)  # 每 30 秒检查一次
+            time.sleep(300)  # 每 5 分钟检查一次
 
             if not self.is_running:
                 break
 
-            # 检查连接是否还活着
+            # 检查连接是否长时间没有活动（仅 debug 级别，正常空闲不报警）
             if self.client:
                 try:
-                    # 如果没有最近的心跳，可能连接已死
                     time_since_heartbeat = time.time() - self.last_heartbeat
-                    if time_since_heartbeat > 120:  # 2 分钟没有收到消息或心跳
-                        logger.warning(
-                            f"[{self.bot_name}] ⚠️  {time_since_heartbeat:.0f}s 没有消息，可能连接已死"
+                    if time_since_heartbeat > 3600:  # 1 小时没收到任何消息才提示
+                        logger.debug(
+                            f"[{self.bot_name}] 连接空闲 {time_since_heartbeat/3600:.1f}h，WebSocket 仍运行中"
                         )
-                        # 这里可以添加更强的健康检查逻辑
                 except Exception as e:
                     logger.error(f"[{self.bot_name}] 心跳监控错误: {e}")
 
