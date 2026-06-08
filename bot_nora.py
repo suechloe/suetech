@@ -13,6 +13,12 @@ from tools.feishu_connection import FeishuConnectionManager
 from tools.push import send_to_chloe
 from task_handler import process_message as crew_process
 
+logging.basicConfig(
+    level=logging.INFO,
+    format='[%(asctime)s] [%(name)s] %(levelname)s: %(message)s',
+    stream=__import__('sys').stdout,
+)
+
 LABEL = "📋 Nora [CEO]"
 BALANCE_KEYWORDS = ["余额", "额度", "balance"]
 
@@ -91,7 +97,7 @@ def on_message(data: P2ImMessageReceiveV1):
     if not should_respond(text):
         return
 
-    print(f"[Nora] 收到消息: {text[:80]}")
+    print(f"[Nora] 收到消息: chat={chat_id[:12]}... text={text[:80]}", flush=True)
     send_message(chat_id, "⏳ 处理中...")
 
     async def run():

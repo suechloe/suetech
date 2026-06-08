@@ -17,6 +17,11 @@ LABEL = "⚖️ Elle [法律]"
 ELLE_KEYWORDS = ["elle", "法律", "合同", "协议", "维权", "起草", "条款", "纠纷", "投诉", "律师", "法规", "权益", "诉讼"]
 
 logger = logging.getLogger("bot_elle")
+logging.basicConfig(
+    level=logging.INFO,
+    format='[%(asctime)s] [%(name)s] %(levelname)s: %(message)s',
+    stream=__import__('sys').stdout,
+)
 
 def run_async(coro):
     loop = asyncio.new_event_loop()
@@ -79,7 +84,7 @@ def on_message(data: P2ImMessageReceiveV1):
     if not should_respond(text):
         return
 
-    print(f"[Elle] 收到消息: {text[:80]}")
+    print(f"[Elle] 收到消息: chat={chat_id[:12]}... text={text[:80]}", flush=True)
     send_message(chat_id, "⏳ 处理中...")
 
     async def run():

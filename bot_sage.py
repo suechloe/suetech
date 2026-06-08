@@ -17,6 +17,11 @@ LABEL = "💻 Sage [代码]"
 SAGE_KEYWORDS = ["sage", "代码", "程序", "bug", "错误", "修改", "网站", "系统", "技术", "部署", "服务器", "脚本", "开发", "功能"]
 
 logger = logging.getLogger("bot_sage")
+logging.basicConfig(
+    level=logging.INFO,
+    format='[%(asctime)s] [%(name)s] %(levelname)s: %(message)s',
+    stream=__import__('sys').stdout,
+)
 
 def run_async(coro):
     loop = asyncio.new_event_loop()
@@ -79,7 +84,7 @@ def on_message(data: P2ImMessageReceiveV1):
     if not should_respond(text):
         return
 
-    print(f"[Sage] 收到消息: {text[:80]}")
+    print(f"[Sage] 收到消息: chat={chat_id[:12]}... text={text[:80]}", flush=True)
     send_message(chat_id, "⏳ 处理中...")
 
     async def run():

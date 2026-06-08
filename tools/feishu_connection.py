@@ -71,11 +71,17 @@ class FeishuConnectionManager:
             self.backoff_delay = self.initial_backoff
             self.connection_attempts = 0
             self.last_heartbeat = time.time()
-            logger.info(f"[{self.bot_name}] ✅ 连接成功")
+            msg = f"[{self.bot_name}] ✅ 连接成功"
+            logger.info(msg)
+            print(msg, flush=True)
 
             return True
         except Exception as e:
-            logger.error(f"[{self.bot_name}] ❌ 连接失败: {e}")
+            err = f"[{self.bot_name}] ❌ 连接失败: {e}"
+            logger.error(err)
+            print(err, flush=True)
+            import traceback
+            traceback.print_exc()
             return False
 
     def _monitor_heartbeat(self):
