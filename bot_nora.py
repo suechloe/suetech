@@ -22,15 +22,9 @@ logging.basicConfig(
 LABEL = "📋 Nora [CEO]"
 BALANCE_KEYWORDS = ["余额", "额度", "balance"]
 
-# Nora 响应关键词：三个 agent 的关键词全部覆盖
-# Sage 和 Elle 不是独立飞书 bot，消息统一由 Nora 接收后内部路由
+# Nora 只响应自己的关键词（Sage 和 Elle 是独立飞书 bot，各自处理自己的话题）
 NORA_KEYWORDS = [
-    # Nora 自己
     "nora", "诺拉", "日程", "安排", "规划", "计划", "会议", "提醒", "任务", "进度", "汇报", "总结",
-    # Sage（技术/代码）
-    "sage", "代码", "程序", "bug", "错误", "修改", "网站", "系统", "技术", "部署", "服务器", "脚本", "开发", "功能",
-    # Elle（法律）
-    "elle", "法律", "合同", "协议", "维权", "起草", "条款", "纠纷", "投诉", "律师", "法规", "权益", "诉讼",
 ]
 
 logger = logging.getLogger("bot_nora")
@@ -104,21 +98,9 @@ def on_message(data: P2ImMessageReceiveV1):
         try:
             if any(kw in text for kw in BALANCE_KEYWORDS):
                 result = await check_and_alert(lambda m: None)
-                label = LABEL
-            elif any(kw in text.lower() for kw in ["sage", "代码", "程序", "bug", "错误", "修改", "网站", "系统", "技术", "部署", "服务器", "脚本", "开发", "功能"]):
-                # 技术问题 → 直接调用 Sage agent
-                from agents.sage import sage as sage_fn
-                result = await sage_fn(text)
-                label = "💻 Sage [代码]"
-            elif any(kw in text.lower() for kw in ["elle", "法律", "合同", "协议", "维权", "起草", "条款", "纠纷", "投诉", "律师", "法规", "权益", "诉讼"]):
-                # 法律问题 → 直接调用 Elle agent
-                from agents.elle import elle as elle_fn
-                result = await elle_fn(text)
-                label = "⚖️ Elle [法律]"
             else:
                 result = await crew_process(text, source="feishu_nora")
-                label = LABEL
-            send_message(chat_id, f"{label}\n\n{result}")
+            send_message(chat_id, f"{LABEL}\n\n{result}")
         except Exception as e:
             send_message(chat_id, f"❌ 出错了：{e}")
 
