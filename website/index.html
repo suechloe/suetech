@@ -3,7 +3,7 @@
 <head>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <title>Sue Tech — 把知识库变成 AI 管理层</title>
+  <title>suetech — AI 公司操作系统</title>
   <link rel="icon" type="image/svg+xml" href="/favicon.svg" />
   <link rel="preconnect" href="https://fonts.googleapis.com" />
   <link href="https://fonts.googleapis.com/css2?family=Inter:opsz@14..32&family=Noto+Sans+SC:wght@400;500;600;700;800&display=swap" rel="stylesheet" />
@@ -146,6 +146,70 @@
     .agent-card .role { font-size: .85rem; color: var(--accent); font-weight: 500; margin-bottom: 12px; }
     .agent-card p { color: var(--muted); font-size: .95rem; }
 
+    /* ── Org Map ── */
+    .org-map {
+      margin: 48px auto 0;
+      max-width: 980px;
+    }
+    .org-node {
+      background: var(--card-bg);
+      border: 1px solid var(--border);
+      border-radius: 14px;
+      padding: 18px 20px;
+      text-align: center;
+      box-shadow: 0 6px 24px rgba(0,0,0,.04);
+    }
+    .org-node strong {
+      display: block;
+      font-size: 1.1rem;
+      margin-bottom: 4px;
+    }
+    .org-node span {
+      color: var(--muted);
+      font-size: .88rem;
+    }
+    .org-node.owner {
+      background: #1a1a2e;
+      color: #fff;
+      border-color: #1a1a2e;
+    }
+    .org-node.owner span { color: rgba(255,255,255,.72); }
+    .org-node.brain {
+      border-color: rgba(212,131,90,.55);
+      background: var(--accent-light);
+    }
+    .org-node.atlas {
+      border-style: dashed;
+      background: transparent;
+    }
+    .org-line {
+      width: 1px;
+      height: 28px;
+      background: var(--border);
+      margin: 0 auto;
+    }
+    .org-row {
+      display: grid;
+      grid-template-columns: repeat(4, minmax(0, 1fr));
+      gap: 14px;
+      position: relative;
+    }
+    .org-row::before {
+      content: '';
+      position: absolute;
+      top: -15px;
+      left: 12.5%;
+      right: 12.5%;
+      height: 1px;
+      background: var(--border);
+    }
+    .org-note {
+      margin-top: 28px;
+      color: var(--muted);
+      font-size: .95rem;
+      text-align: center;
+    }
+
     /* ── Features ── */
     .features-grid {
       display: grid; grid-template-columns: repeat(auto-fit, minmax(240px, 1fr));
@@ -195,6 +259,9 @@
       nav .links { display: none; }
       section { padding: 48px 16px; }
       .agents-grid { grid-template-columns: 1fr; }
+      .org-row { grid-template-columns: 1fr; }
+      .org-row::before { display: none; }
+      .org-map { margin-top: 32px; }
     }
 
     /* ── Nora Chat Widget ── */
@@ -452,10 +519,10 @@
       <!-- Orange sparkle star (upper right, separated) -->
       <path d="M 37 8 Q 39 18 46 20 Q 39 22 37 32 Q 35 22 28 20 Q 35 18 37 8 Z" fill="url(#stG2)"/>
     </svg>
-    Sue <span>Tech</span>
+    sue<span>tech</span>
   </div>
   <div class="links">
-    <a href="#agents">Agent</a>
+    <a href="#agents">架构</a>
     <a href="#features">特点</a>
     <a href="#dashboard">控制台</a>
     <a class="btn-dash" href="mailto:ahlumos@163.com">联系我们 →</a>
@@ -465,12 +532,12 @@
 <!-- ═══ Hero ═══ -->
 <section class="hero" id="hero">
   <h1>
-    把知识库变成<br>
-    <span class="highlight">AI 管理层</span>
+    把大脑、公司和 Agent<br>
+    <span class="highlight">接成一套系统</span>
   </h1>
   <p>
-    SueTech 将企业知识库、工作流和 AI Agent 连接起来，<br>
-    让业务流程拥有可协作、可追踪、可汇报的 AI 管理层。
+    suetech 把 Chloe OS、Nora 和专业 Agent 连接起来，<br>
+    让一个人的想法可以被记住、拆解、执行和复盘。
   </p>
   <div class="actions">
     <a class="primary" href="mailto:ahlumos@163.com">预约演示</a>
@@ -480,66 +547,102 @@
 
 <!-- ═══ Agents ═══ -->
 <section id="agents">
-  <div class="section-label">AI Agent</div>
-  <h2 class="section-title">三位专家，一个团队</h2>
-  <p class="section-desc">每个 Agent 都有独立人格和专业领域，协作解决你的问题。</p>
+  <div class="section-label">Company OS</div>
+  <h2 class="section-title">Chole 的公司操作系统</h2>
+  <p class="section-desc">Chloe OS 是 Chole 的大脑和分身；Nora 负责调度公司；专业 Agent 平级协作。Atlas 是外置大脑，不进入公司管理线。</p>
+  <div class="org-map" aria-label="suetech 架构图">
+    <div class="org-node owner">
+      <strong>Chole</strong>
+      <span>老板 / 本体 / 最终拍板</span>
+    </div>
+    <div class="org-line"></div>
+    <div class="org-node brain">
+      <strong>Chloe OS</strong>
+      <span>大脑 / 分身 / 知识库 / 代理人格</span>
+    </div>
+    <div class="org-line"></div>
+    <div class="org-node">
+      <strong>Nora</strong>
+      <span>公司调度 / 分任务 / 催结果</span>
+    </div>
+    <div class="org-line"></div>
+    <div class="org-row">
+      <div class="org-node">
+        <strong>Mason</strong>
+        <span>CFO / 记账 / 现金流压力</span>
+      </div>
+      <div class="org-node">
+        <strong>CTO</strong>
+        <span>技术架构 / 工程执行</span>
+      </div>
+      <div class="org-node">
+        <strong>Legal</strong>
+        <span>合同 / 合规 / 风险</span>
+      </div>
+      <div class="org-node">
+        <strong>Sales</strong>
+        <span>线索 / 客户 / 成交</span>
+      </div>
+    </div>
+    <p class="org-note">Atlas 是 Chole 的外置大脑和平级顾问，只提供判断和校准，不进入 suetech 的执行架构。</p>
+  </div>
   <div class="agents-grid">
+    <div class="agent-card">
+      <div class="icon">🧠</div>
+      <h3>Chloe OS</h3>
+      <div class="role">Chole 的大脑系统</div>
+      <p>保存 Chole 的背景、偏好、目标和判断方式。它不是普通助手，而是 Chole 在系统里的分身。</p>
+    </div>
     <div class="agent-card">
       <div class="icon">📋</div>
       <h3>Nora</h3>
-      <div class="role">CEO · 首席协调官</div>
-      <p>理解你的意图，协调 Sage 和 Elle 分工协作。把复杂的事拆解成清晰的任务，给你大白话的最终答案。</p>
+      <div class="role">公司调度官</div>
+      <p>把 Chloe OS 或 Chole 确认的任务拆给专业 Agent，追踪进度，催结果，保证事情不会悬空。</p>
     </div>
     <div class="agent-card">
-      <div class="icon">💻</div>
-      <h3>Sage</h3>
-      <div class="role">首席工程师</div>
-      <p>Claude 在 Sue Tech 的技术分身。写代码、搭系统、修 bug、自动化，所有技术问题交给他。</p>
-    </div>
-    <div class="agent-card">
-      <div class="icon">⚖️</div>
-      <h3>Elle</h3>
-      <div class="role">法律顾问</div>
-      <p>审查合同、提供法律建议、起草文书、评估风险。给你清晰的法律参考意见。</p>
+      <div class="icon">💰</div>
+      <h3>Mason</h3>
+      <div class="role">CFO · 财务压力官</div>
+      <p>记录成本、追踪退款、计算现金流和收入缺口。每一笔支出都要回答：它带来多少钱？</p>
     </div>
   </div>
 </section>
 
 <!-- ═══ Features ═══ -->
 <section id="features">
-  <div class="section-label">为什么选择 Sue Tech</div>
-  <h2 class="section-title">AI 团队，而非单个助手</h2>
-  <p class="section-desc">多专家协作的 AI 系统，比单个 AI 更专业、更可靠。</p>
+  <div class="section-label">怎么运转</div>
+  <h2 class="section-title">不是上下级，是清楚分工</h2>
+  <p class="section-desc">每个 Agent 都有自己的边界。Nora 管流程，不替专业 Agent 下结论；Mason、CTO、Legal、Sales 平级负责各自领域。</p>
   <div class="features-grid">
     <div class="feature-item">
       <div class="f-icon">🤝</div>
-      <h4>多专家协作</h4>
-      <p>Nora 分析意图后委派给最合适的专家（Sage/Elle），比你逐个找工具更高效。</p>
+      <h4>平级专家协作</h4>
+      <p>Mason、CTO、Legal、Sales 各管一块。Nora 负责推进，不替他们做专业判断。</p>
     </div>
     <div class="feature-item">
       <div class="f-icon">🧠</div>
-      <h4>深度技术能力</h4>
-      <p>Sage 由 Claude 驱动，拥有和 AI 前沿模型同等的代码生成与系统设计能力。</p>
+      <h4>Chloe OS 记住你</h4>
+      <p>你的目标、风格、边界和长期想法会进入 Chloe OS，减少反复解释。</p>
     </div>
     <div class="feature-item">
       <div class="f-icon">🔒</div>
-      <h4>法律护航</h4>
-      <p>Elle 提供中国法律体系下的合同审查、维权建议和风险评估参考。</p>
+      <h4>Atlas 不进公司线</h4>
+      <p>Atlas 是外置大脑，只帮 Chole 看局、推演和校准，不参与公司管理线。</p>
     </div>
     <div class="feature-item">
       <div class="f-icon">💬</div>
-      <h4>飞书内直接对话</h4>
-      <p>在飞书上像聊天一样召唤三位 Agent，无需切换平台。</p>
+      <h4>Nora 负责不悬空</h4>
+      <p>任务被拆给谁、什么时候回、卡在哪里，都由 Nora 跟进和汇总。</p>
     </div>
     <div class="feature-item">
       <div class="f-icon">📊</div>
-      <h4>可视化控制台</h4>
-      <p>网页 Dashboard 实时查看 Agent 状态、对话记录、API 用量。</p>
+      <h4>Mason 盯住现金流</h4>
+      <p>订阅、域名、服务器、退款和设备成本，都要和收入动作绑定。</p>
     </div>
     <div class="feature-item">
       <div class="f-icon">🚀</div>
-      <h4>一人公司标配</h4>
-      <p>专为创始人打造——你不需要团队，Sue Tech 就是你的团队。</p>
+      <h4>适合一人公司</h4>
+      <p>Chole 做最终决定，系统负责记忆、调度、执行和复盘。</p>
     </div>
   </div>
 </section>
@@ -548,11 +651,11 @@
 <section id="dashboard">
   <div class="section-label">控制台</div>
   <h2 class="section-title">对话 & 管理后台</h2>
-  <p class="section-desc">在网页端与三位 Agent 对话，查看对话历史、API 用量和系统状态。</p>
+  <p class="section-desc">在网页端与 Agent 对话，查看对话历史、API 用量、任务状态和财务压力。</p>
   <div class="dash-preview">
     <div class="dash-header">
-      <h3>Sue Tech Dashboard</h3>
-      <p>实时控制台 · Agent 对话 · 用量监控</p>
+      <h3>suetech Dashboard</h3>
+      <p>实时控制台 · Agent 对话 · 任务追踪 · 成本监控</p>
       <a href="mailto:ahlumos@163.com">申请试用 →</a>
     </div>
     <div class="dash-mock">
@@ -564,7 +667,7 @@
 
 <!-- ═══ Footer ═══ -->
 <footer>
-  <p>© 2026 <span>Sue Tech</span> · Built with Claude</p>
+  <p>© 2026 <span>suetech</span> · Built with Claude</p>
 </footer>
 
 <!-- ═══ Nora Chat Widget ═══ -->
@@ -580,7 +683,7 @@
     <div class="nora-avatar">📋</div>
     <div class="nora-info">
       <h4>Nora</h4>
-      <p>Sue Tech CEO · AI 助手</p>
+      <p>suetech 调度官 · AI 助手</p>
     </div>
     <button class="nora-close" onclick="toggleNoraPanel()">×</button>
   </div>
@@ -647,7 +750,7 @@
       panel.classList.add('open');
       if (!noraGreeted) {
         noraGreeted = true;
-        setTimeout(() => appendNoraMsg('from-nora', '你好！我是 Nora，Sue Tech 的 AI 助手。有什么可以帮你的吗？'), 300);
+        setTimeout(() => appendNoraMsg('from-nora', '你好！我是 Nora，suetech 的公司调度官。有什么需要我推进的吗？'), 300);
       }
       setTimeout(() => document.getElementById('nora-input').focus(), 350);
     } else {
